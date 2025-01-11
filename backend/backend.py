@@ -27,8 +27,14 @@ def sms_system():
 @app.route("/mongodb")
 def return_database():
     try:
-        client.admin.command('ping')
-        return "Pinged your deployment. You successfully connected to MongoDB!"
+        database = client["sample_restaurants"]
+        restaurants = database.restaurants.find({"cuisine": "Spanish"})
+        results = []
+
+        for restaurant in restaurants:
+            results.append(restaurant["name"])
+
+        return str(results)
     except Exception as e:
         return str(e)
 
