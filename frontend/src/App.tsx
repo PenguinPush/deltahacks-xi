@@ -1,5 +1,6 @@
 import "./App.css";
 import ProfileCard from "./components/ProfileCard";
+import Map from "./components/Map";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
 
@@ -11,6 +12,7 @@ function App() {
 
     return (
         <>
+            <Map></Map>
             {dummyInfo.map((info) => (
                 <ProfileCard {...info} />
             ))}
