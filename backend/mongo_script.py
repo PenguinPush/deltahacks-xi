@@ -31,21 +31,33 @@ def get_user_by_phonenumber(phonenumber):
 
 
 def add_friend_request(user_phonenumber, friend_phonenumber):
-    # Find the user who is sending the request
     user = collection.find_one({"phonenumber": user_phonenumber})
+    friend = collection.find_one({"phonenumber": friend_phonenumber})
     
-    # If the user exists, proceed to add the friend
-    if user:
+    if user and friend:
+        # Add the friend's number to the user's friends list
         if friend_phonenumber not in user["friends"]:
             collection.update_one(
                 {"phonenumber": user_phonenumber},
                 {"$push": {"friends": friend_phonenumber}}
             )
-            print(f"Friend request sent! {friend_phonenumber} added to {user_phonenumber}'s friend list.")
+            print(f"{friend_phonenumber} added to {user_phonenumber}'s friend list.")
         else:
             print(f"{friend_phonenumber} is already a friend of {user_phonenumber}.")
+        
+        # Add the user's number to the friend's friends list
+        if user_phonenumber not in friend["friends"]:
+            collection.update_one(
+                {"phonenumber": friend_phonenumber},
+                {"$push": {"friends": user_phonenumber}}
+            )
+            print(f"{user_phonenumber} added to {friend_phonenumber}'s friend list.")
+        else:
+            print(f"{user_phonenumber} is already a friend of {friend_phonenumber}.")
     else:
-        print(f"User with phone number {user_phonenumber} not found.")
+        print(f"Either {user_phonenumber} or {friend_phonenumber} does not exist in the database.")
+
+
 
 def get_friends_info(user_phonenumber):
     user = collection.find_one({"phonenumber": user_phonenumber})
@@ -56,9 +68,7 @@ def get_friends_info(user_phonenumber):
         friends_info = []
         for friend_phonenumber in friends_phone_numbers:
             friend = collection.find_one({"phonenumber": friend_phonenumber})
-            if friend:
-                status_dict = {0: "safe", 1: "on-the-move", 2: "pickle"}
-                friend['status'] = status_dict.get(friend['status'], "Unknown")  
+            if friend: 
                 friends_info.append(friend)
             else:
                 print(f"Friend with phone number {friend_phonenumber} not found.")
@@ -70,7 +80,4 @@ def get_friends_info(user_phonenumber):
         else:
             print(f"{user_phonenumber} has no friends.")
     else:
-        print(f"User with phone number {user_phonenumber} not found.")
-        
-        
-
+        print(f"User with phone number {user_phonenumber} not found.")  
