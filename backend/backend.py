@@ -3,11 +3,11 @@ from twilio.twiml.messaging_response import MessagingResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
+from dotenv import load_dotenv
 
-uri = os.environ.get(
-    'MONGODB_URI',
-    'mongodb+srv://andrewdaidev:pickle@pickle.t9u1m.mongodb.net/?retryWrites=true&w=majority&appName=Pickle'
-)
+load_dotenv()
+
+uri = os.getenv('MONGODB_URI')
 
 app = Flask(__name__, static_folder='../frontend')
 client = MongoClient(uri, server_api=ServerApi('1'))
@@ -27,12 +27,12 @@ def sms_system():
 @app.route("/mongodb")
 def return_database():
     try:
-        database = client["sample_restaurants"]
-        restaurants = database.restaurants.find({"cuisine": "Spanish"})
+        database = client["pickle_data"]
+        users = database.users.find({"cuisine": "Spanish"})
         results = []
 
-        for restaurant in restaurants:
-            results.append(restaurant["name"])
+        for user in users:
+            results.append(user["name"])
 
         return str(results)
     except Exception as e:
@@ -49,5 +49,5 @@ def serve(path):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.getenv('PORT'))
     app.run(host='0.0.0.0', port=port, debug=True)

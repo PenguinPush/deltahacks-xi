@@ -5,11 +5,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class EmergencyAssistant:
     def __init__(self):
         # Initialize Cohere client (you'll need to set your API key in environment variables)
         self.co = cohere.Client(os.getenv('COHERE_API_KEY'))
-        
+
         # Define the initial system prompt
         self.system_prompt = """You are an emergency assistance AI. Your role is to:
 1. Remain calm and professional
@@ -30,12 +31,12 @@ Always prioritize user safety and direct them to call emergency services (911) f
             temperature=0.7,
             connectors=[{"id": "web-search"}]  # Optional: Enable web search for up-to-date information
         )
-        
+
         return {
             "response": response.text,
             "emergency_level": self._assess_emergency_level(user_message)
         }
-    
+
     def _assess_emergency_level(self, message: str) -> str:
         """
         Assess the emergency level based on keywords and context
@@ -43,11 +44,11 @@ Always prioritize user safety and direct them to call emergency services (911) f
         """
         critical_keywords = ['heart attack', 'stroke', 'bleeding', 'unconscious', 'not breathing']
         urgent_keywords = ['broken', 'injury', 'pain', 'accident']
-        
+
         message = message.lower()
-        
+
         if any(keyword in message for keyword in critical_keywords):
             return 'critical'
         elif any(keyword in message for keyword in urgent_keywords):
             return 'urgent'
-        return 'normal' 
+        return 'normal'
