@@ -33,6 +33,31 @@
     gap: 8px;
 }
 
+.status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-icon {
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.safe {
+    background-color: "green";
+}
+
+.on-the-move {
+    background-color: "yellow";
+}
+
+.pickle {
+    background-color: "red";
+}
+
 .name {
     margin: 0;
 }
