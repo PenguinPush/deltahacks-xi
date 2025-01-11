@@ -1,5 +1,4 @@
 from emergency_assistant import EmergencyAssistant
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,7 +16,6 @@ def main():
 
         response = assistant.get_response(user_input)
         print(f"\nAssistant: {response['response']}")
-        print(f"Emergency Level: {response['emergency_level']}")
 
 
 if __name__ == "__main__":

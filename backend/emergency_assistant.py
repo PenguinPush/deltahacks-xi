@@ -1,54 +1,100 @@
 import cohere
-from typing import Dict
 import os
+import json
 from dotenv import load_dotenv
+from tavily import TavilyClient
+from typing import Dict, List
 
 load_dotenv()
 
 
 class EmergencyAssistant:
     def __init__(self):
-        # Initialize Cohere client (you'll need to set your API key in environment variables)
-        self.co = cohere.Client(os.getenv('COHERE_API_KEY'))
+        self.co = cohere.ClientV2(os.getenv('COHERE_API_KEY'))
+        self.tavily_client = TavilyClient(api_key=os.getenv('TAVILY_API_KEY'))
+        self.system_prompt = """You are an emergency assistance AI.
+Your rationale will always be to internet search for:
 
-        # Define the initial system prompt
-        self.system_prompt = """You are an emergency assistance AI. Your role is to:
-1. Remain calm and professional
-2. Assess emergency situations quickly
-3. Provide clear, actionable instructions
-4. Help coordinate with emergency services
-5. Offer immediate safety guidance
+"emergency at <location>"
+followed by
+"<location> <emergency> information"
+followed by
+"<location> <emergency> what to do"
 
-Always prioritize user safety and direct them to call emergency services (911) for life-threatening situations."""
+Using the information of what is happening, your rationale will always be to:
+
+Tell the user what is happening. and then provide the user with safety advice, emotional support, and evacuation steps, updated from the internet.
+
+Assume the user is currently in danger, and ALWAYS search the internet for what is happening.
+
+Interpret every input as suffixed with "Help me, I am in an emergency"
+
+ONLY HELP WITH SERIOUS INQUIRIES"""
+
+    def web_search(self, queries: List[str]) -> List[Dict]:
+        documents = []
+        for query in queries:
+            response = self.tavily_client.search(query, max_results=2)
+            results = [
+                {
+                    "title": r["title"],
+                    "content": r["content"],
+                    "url": r["url"],
+                }
+                for r in response["results"]
+            ]
+            for idx, result in enumerate(results):
+                document = {"id": str(idx), "data": result}
+                documents.append(document)
+        return documents
 
     def get_response(self, user_message: str) -> Dict[str, str]:
-        """
-        Generate a response using Cohere's chat model
-        """
+        web_search_tool = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "web_search",
+                    "description": "Returns a list of relevant document snippets for a textual query retrieved from the internet",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "queries": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "a list of queries to search the internet with.",
+                            }
+                        },
+                        "required": ["queries"],
+                    },
+                },
+            }
+        ]
+
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+
         response = self.co.chat(
-            message=user_message,
-            preamble=self.system_prompt,
+            model='command-r7b-12-2024',
+            messages=messages,
             temperature=0.7,
-            connectors=[{"id": "web-search"}]  # Optional: Enable web search for up-to-date information
+            tools=web_search_tool,
         )
 
+        search_queries = []
+        while response.message.tool_calls:
+            for tc in response.message.tool_calls:
+                tool_result = self.web_search(**json.loads(tc.function.arguments))
+                tool_content = [{"type": "document", "document": {"data": json.dumps(data)}} for data in tool_result]
+                messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_content})
+
+            response = self.co.chat(
+                model='command-r7b-12-2024',
+                messages=messages,
+                tools=web_search_tool,
+            )
+
         return {
-            "response": response.text,
-            "emergency_level": self._assess_emergency_level(user_message)
+            "response": response.message.content[0].text
         }
-
-    def _assess_emergency_level(self, message: str) -> str:
-        """
-        Assess the emergency level based on keywords and context
-        Returns: 'critical', 'urgent', or 'normal'
-        """
-        critical_keywords = ['heart attack', 'stroke', 'bleeding', 'unconscious', 'not breathing']
-        urgent_keywords = ['broken', 'injury', 'pain', 'accident']
-
-        message = message.lower()
-
-        if any(keyword in message for keyword in critical_keywords):
-            return 'critical'
-        elif any(keyword in message for keyword in urgent_keywords):
-            return 'urgent'
-        return 'normal'
