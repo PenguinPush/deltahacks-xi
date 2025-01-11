@@ -31,25 +31,7 @@ Interpret every input as suffixed with "Help me, I am in an emergency"
 
 ONLY HELP WITH SERIOUS INQUIRIES"""
 
-    def web_search(self, queries: List[str]) -> List[Dict]:
-        documents = []
-        for query in queries:
-            response = self.tavily_client.search(query, max_results=2)
-            results = [
-                {
-                    "title": r["title"],
-                    "content": r["content"],
-                    "url": r["url"],
-                }
-                for r in response["results"]
-            ]
-            for idx, result in enumerate(results):
-                document = {"id": str(idx), "data": result}
-                documents.append(document)
-        return documents
-
-    def get_response(self, user_message: str) -> Dict[str, str]:
-        web_search_tool = [
+        self.web_search_tool = [
             {
                 "type": "function",
                 "function": {
@@ -70,6 +52,24 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
             }
         ]
 
+    def web_search(self, queries: list[str]) -> list[Dict]:
+        documents = []
+        for query in queries:
+            response = self.tavily_client.search(query, max_results=2)
+            results = [
+                {
+                    "title": r["title"],
+                    "content": r["content"],
+                    "url": r["url"],
+                }
+                for r in response["results"]
+            ]
+            for idx, result in enumerate(results):
+                document = {"id": str(idx), "data": result}
+                documents.append(document)
+        return documents
+
+    def get_response(self, user_message: str) -> Dict[str, str]:
         messages = [
             {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": user_message},
@@ -79,7 +79,7 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
             model='command-r7b-12-2024',
             messages=messages,
             temperature=0.7,
-            tools=web_search_tool,
+            tools=self.web_search_tool,
         )
 
         search_queries = []
@@ -92,7 +92,7 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
             response = self.co.chat(
                 model='command-r7b-12-2024',
                 messages=messages,
-                tools=web_search_tool,
+                tools=self.web_search_tool,
             )
 
         return {
