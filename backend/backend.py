@@ -1,8 +1,16 @@
 from flask import Flask, send_from_directory, request, redirect
 from twilio.twiml.messaging_response import MessagingResponse
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 import os
 
+uri = os.environ.get(
+    'MONGODB_URI',
+    'mongodb+srv://andrewdaidev:pickle@pickle.t9u1m.mongodb.net/?retryWrites=true&w=majority&appName=Pickle'
+)
+
 app = Flask(__name__, static_folder='../frontend')
+client = MongoClient(uri, server_api=ServerApi('1'))
 
 
 @app.route("/sms", methods=['GET', 'POST'])
@@ -14,6 +22,15 @@ def sms_system():
     resp.message(body.upper())
 
     return str(resp)
+
+
+@app.route("/mongodb")
+def return_database():
+    try:
+        client.admin.command('ping')
+        return "Pinged your deployment. You successfully connected to MongoDB!"
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/', defaults={'path': ''})
