@@ -1,19 +1,14 @@
 from pymongo import MongoClient
 from bson import ObjectId
 
-# Replace with your actual connection string
 connection_string = "mongodb+srv://andrewdaidev:pickle@pickle.t9u1m.mongodb.net/?retryWrites=true&w=majority&appName=Pickle"
 
-# Connect to MongoDB
 client = MongoClient(connection_string)
 
-# Access your database and collection
 db = client["pickle_data"]
 collection = db["users"]
 
-# Function to insert a new user
 def insert_user(phonenumber, name, friends, location, status):
-    # Create the document
     user = {
         "phonenumber": phonenumber,
         "name": name,
@@ -24,11 +19,9 @@ def insert_user(phonenumber, name, friends, location, status):
         "status": status
     }
     
-    # Insert the document into the collection
     result = collection.insert_one(user)
     print(f"User inserted with ID: {result.inserted_id}")
 
-# Function to retrieve a user by phonenumber
 def get_user_by_phonenumber(phonenumber):
     user = collection.find_one({"phonenumber": phonenumber})
     if user:
@@ -36,8 +29,48 @@ def get_user_by_phonenumber(phonenumber):
     else:
         print("User not found.")
 
-# Example: Insert a user
-insert_user("1234567890", "John Doe", ["9876543210", "1230984567"], [-73.935242, 40.730610], "0")
 
-# Example: Retrieve a user by phonenumber
-get_user_by_phonenumber("1234567890")
+def add_friend_request(user_phonenumber, friend_phonenumber):
+    # Find the user who is sending the request
+    user = collection.find_one({"phonenumber": user_phonenumber})
+    
+    # If the user exists, proceed to add the friend
+    if user:
+        if friend_phonenumber not in user["friends"]:
+            collection.update_one(
+                {"phonenumber": user_phonenumber},
+                {"$push": {"friends": friend_phonenumber}}
+            )
+            print(f"Friend request sent! {friend_phonenumber} added to {user_phonenumber}'s friend list.")
+        else:
+            print(f"{friend_phonenumber} is already a friend of {user_phonenumber}.")
+    else:
+        print(f"User with phone number {user_phonenumber} not found.")
+
+def get_friends_info(user_phonenumber):
+    user = collection.find_one({"phonenumber": user_phonenumber})
+    
+    if user:
+        friends_phone_numbers = user.get("friends", [])
+        
+        friends_info = []
+        for friend_phonenumber in friends_phone_numbers:
+            friend = collection.find_one({"phonenumber": friend_phonenumber})
+            if friend:
+                status_dict = {0: "safe", 1: "on-the-move", 2: "pickle"}
+                friend['status'] = status_dict.get(friend['status'], "Unknown")  
+                friends_info.append(friend)
+            else:
+                print(f"Friend with phone number {friend_phonenumber} not found.")
+        
+        if friends_info:
+            print(f"Friends information for {user_phonenumber}:")
+            for friend in friends_info:
+                print(friend)
+        else:
+            print(f"{user_phonenumber} has no friends.")
+    else:
+        print(f"User with phone number {user_phonenumber} not found.")
+        
+        
+
