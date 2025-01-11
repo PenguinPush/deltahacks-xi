@@ -7,10 +7,11 @@ app = Flask(__name__, static_folder='../frontend')
 
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_reply():
+    # Get the message the user sent our Twilio number
+    body = request.values.get('Body', None)
     resp = MessagingResponse()
 
-    # Add a message
-    resp.message("The Robots are coming! Head for the hills!")
+    resp.message(body.upper())
 
     return str(resp)
 
