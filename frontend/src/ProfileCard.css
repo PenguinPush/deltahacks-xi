@@ -1,0 +1,55 @@
+.card {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 16px;
+    flex-direction: row;
+    outline: 2px solid green;
+    padding: 0.5em;
+}
+
+.profile {
+    background-color: red;
+    outline: 2px solid rebeccapurple;
+    border-radius: 100%;
+    font-size: 32px;
+    width: 2em;
+    height: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+}
+.secondaryInfo {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    text-align: left;
+    gap: 8px;
+}
+
+.name {
+    margin: 0;
+}
+
+.location {
+    margin: 0;
+}
+
+.distance {
+    margin: 0;
+}
+
+@media (max-width: 440px) {
+    .profile {
+        font-size: 24px;
+    }
+    .name {
+        font-size: 24px;
+    }
+}
