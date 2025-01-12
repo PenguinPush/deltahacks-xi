@@ -64,18 +64,12 @@ export default function Map({ friends }: MapProps) {
     useEffect(() => {
         async function fetchUsers() {
             try {
-<<<<<<< HEAD
                 const response = await fetch("http://127.0.0.1:5000/api/users");
                 if (!response.ok) {
                     // Log the response if it's not OK
                     const text = await response.text();
                     console.error("Error fetching users:", text);
                     return;
-=======
-                const response = await fetch("/api/get-all-users");
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
->>>>>>> ccb13cc03878dabab5378b26e986495c4f7a9a61
                 }
                 const data: Array<{
                     name: string;

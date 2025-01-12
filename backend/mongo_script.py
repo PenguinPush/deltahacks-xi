@@ -103,12 +103,7 @@ def get_all_users():
     return users_list
 
 
-<<<<<<< HEAD
-
-#Update your own status
-=======
 # Update your own status
->>>>>>> ccb13cc03878dabab5378b26e986495c4f7a9a61
 def update_user_status(phonenumber, new_status):
     result = collection.update_one(
         {"phonenumber": phonenumber},
@@ -121,10 +116,3 @@ def update_user_status(phonenumber, new_status):
     else:
         print(f"User {phonenumber} not found or status unchanged")
         return False
-<<<<<<< HEAD
-    
-    
-
-get_all_users()
-=======
->>>>>>> ccb13cc03878dabab5378b26e986495c4f7a9a61
