@@ -11,6 +11,7 @@ from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
 
 from emergency_assistant import EmergencyAssistant
+from mongo_script import get_friends_info
 
 load_dotenv()
 
@@ -177,7 +178,7 @@ def sms_system():
             )
             
             if result.modified_count > 0:
-                resp.message("📍 Location/status updated successfully!")
+                resp.message(str(get_friends_info(from_number)))
             else:
                 resp.message("❌ Could not update location. User not found.")
             
