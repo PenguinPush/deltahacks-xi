@@ -2,7 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type Friend = {
     name: string;
@@ -22,49 +22,54 @@ const HeatmapLayer = ({ data }: { data: [number, number][] }) => {
     const map = useMap();
 
     useEffect(() => {
-        // Add the heat layer
         // @ts-expect-error heatLayer
         const heatLayer = L.heatLayer(data, {
-            radius: 50, // Larger radius for better visibility
+            radius: 50,
             blur: 50,
             maxZoom: 7,
         });
         heatLayer.addTo(map);
 
-        // Cleanup on component unmount
         return () => {
             map.removeLayer(heatLayer);
         };
     }, [data, map]);
-
     return null;
 };
 
 export default function Map({ friends }: MapProps) {
-    // Prepare heatmap data
+    const [showHeatmap, setShowHeatmap] = useState(true);
+
     const heatmapData: [number, number][] = friends.map((friend) => friend.geocode);
 
     return (
-        <MapContainer
-            center={[37.7749, -122.4194]}
-            zoom={5}
-            style={{ height: "100vh", width: "100%" }}
-        >
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <div>
+            <button
+                onClick={() => setShowHeatmap(!showHeatmap)}
+                style={{ marginBottom: "10px", padding: "5px 10px", cursor: "pointer" }}>
+                {showHeatmap ? "Show Friends" : "Show Heatmap"}
+            </button>
 
-            {/* Heatmap Layer */}
-            <HeatmapLayer data={heatmapData} />
+            <MapContainer
+                center={[37.7749, -122.4194]}
+                zoom={5}
+                style={{ height: "40vh", width: "90vw", borderRadius:"8px"}}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            {/* Markers for Friends */}
-            {friends.map((friend) => (
-                <Marker key={friend.phoneNumber} position={friend.geocode}>
-                    <Popup>
-                        <strong>{friend.name}</strong>
-                        <br />
-                        {friend.popup}
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
+                {showHeatmap ? (
+                    <HeatmapLayer data={heatmapData} />
+                ) : (
+                    friends.map((friend) => (
+                        <Marker key={friend.phoneNumber} position={friend.geocode}>
+                            <Popup>
+                                <strong>{friend.name}</strong>
+                                <br />
+                                {friend.popup}
+                            </Popup>
+                        </Marker>
+                    ))
+                )}
+            </MapContainer>
+        </div>
     );
 }

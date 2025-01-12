@@ -80,3 +80,34 @@ def get_friends_info(user_phonenumber):
         
         return friends_info
     return []
+
+#All user data
+def get_all_users():
+    users = collection.find({})
+    users_list = []
+    
+    for user in users:
+        user_data = {
+            "name": user["name"],
+            "phoneNumber": user["phonenumber"],
+            "geocode": user["location"]["coordinates"],
+            "status": user["status"]
+        }
+        users_list.append(user_data)
+    
+    return users_list
+
+
+#Update your own status
+def update_user_status(phonenumber, new_status):
+    result = collection.update_one(
+        {"phonenumber": phonenumber},
+        {"$set": {"status": new_status}}
+    )
+    
+    if result.modified_count > 0:
+        print(f"Status updated successfully for user {phonenumber}")
+        return True
+    else:
+        print(f"User {phonenumber} not found or status unchanged")
+        return False

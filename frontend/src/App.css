@@ -3,17 +3,22 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the content horizontally */
 }
 
 #container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 16px;
+  width: 100%; /* Use relative width for better centering */
+  max-width: 400px; /* Optional: Limit max width for better styling */
+  margin: 0 auto; /* Center the container */
 }
 
 .card {
   padding: 2em;
 }
-
-

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./ProfileCard.css";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
@@ -13,6 +14,8 @@ function ProfileCard({
     distance: string;
     status: userStatus;
 }) {
+    const [currentStatus, setCurrentStatus] = useState<userStatus>(status);
+
     const getStatusLabel = (status: userStatus) => {
         switch (status) {
             case "safe":
@@ -26,14 +29,20 @@ function ProfileCard({
         }
     };
 
-    const { label, color } = getStatusLabel(status);
+    const toggleStatus = () => {
+        const statusOptions: userStatus[] = ["safe", "on-the-move", "pickle"];
+        const currentIndex = statusOptions.indexOf(currentStatus);
+        const nextIndex = (currentIndex + 1) % statusOptions.length; // Loop back to the first option
+        setCurrentStatus(statusOptions[nextIndex]);
+    };
+
+    const { label, color } = getStatusLabel(currentStatus);
 
     return (
         <div className="card">
             <div className="profile">
                 <p className="profile-initial">{Array.from(name)[0]}</p>
             </div>
-
             <div className="info">
                 <h1 className="name">{name}</h1>
                 <div className="secondary-info">
@@ -42,7 +51,7 @@ function ProfileCard({
                 </div>
             </div>
 
-            <div className="status">
+            <div className="status" onClick={toggleStatus} style={{ cursor: "pointer" }}>
                 <span
                     className="status-icon"
                     style={{
