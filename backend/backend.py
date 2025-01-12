@@ -68,7 +68,7 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    user_phone_number = session["user"].get("name", None)
+    user_phone_number = session["user"]["userinfo"]["name"]
 
     if user_phone_number:
         print("A")
