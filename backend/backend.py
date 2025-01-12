@@ -1,15 +1,16 @@
+import json
 import os
 from urllib.parse import quote_plus, urlencode
+
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, jsonify, render_template
+from flask import Flask, redirect, session, url_for, request, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
-import json
+
 from emergency_assistant import EmergencyAssistant
-import json
 
 load_dotenv()
 
@@ -62,62 +63,48 @@ def get_friends_info(user_phonenumber):
     return []
 
 
-@app.route("/login")
-def login():
-    redirect_uri = url_for("callback", _external=True)
-    nonce = oauth.auth0.create_nonce()
-    session["nonce"] = nonce
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=redirect_uri,
-        nonce=nonce
-    )
-
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
-    nonce = session.pop("nonce", None)
-    if not nonce:
-        return "Nonce not found in session", 400
+    session["user"] = token
 
-    user_info = oauth.auth0.parse_id_token(token, nonce=nonce)
+    # Extract user information from the token
+    user_info = oauth.auth0.parse_id_token(token)
+    user_phone_number = user_info.get("phone_number", None)
+    user_name = user_info.get("name", "Unknown")
 
-    # Log the user info for debugging
-    print("User Info:", user_info)
+    if user_phone_number:
+        # Check if user already exists in the MongoDB database
+        database = client["pickle_data"]
+        collection = database.users
 
-    # Save or update user data in MongoDB
-    users_collection = client.db.users
-    existing_user = users_collection.find_one({"user_id": user_info["sub"]})
+        existing_user = collection.find_one({"phone_number": user_phone_number})
 
-    if not existing_user:
-        users_collection.insert_one({
-            "user_id": user_info["sub"],
-            "email": user_info.get("email"),
-            "phone_number": user_info.get("phone_number"),
-            "name": user_info.get("name"),
-            "profile": user_info
-        })
-    else:
-        users_collection.update_one(
-            {"user_id": user_info["sub"]},
-            {"$set": {
-                "email": user_info.get("email"),
-                "phone_number": user_info.get("phone_number"),
-                "name": user_info.get("name"),
-                "profile": user_info
-            }}
-        )
+        if not existing_user:
+            # If the user doesn't exist, create a new user
+            new_user = {
+                "name": user_name,
+                "phone_number": user_phone_number,
+                "friends": [],  # Initially no friends
+                "location": {"coordinates": []},  # Initially no location
+                "status": "safe",  # Default status
+                "sid": session["user"].get("sid", None)  # Use the session sid for authentication
+            }
 
-    session["user"] = user_info
+            # Insert new user into the database
+            collection.insert_one(new_user)
 
-    return redirect("/dashboard")
+        # Optionally update session with user info if necessary
+        session["user_info"] = user_info
+
+    return redirect("/")
 
 
-@app.route("/dashboard")
-def dashboard():
-    user = session.get("user")
-    if not user:
-        return redirect(url_for("login"))
-    return jsonify(user)
+@app.route("/login")
+def login():
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
 
 
 @app.route("/logout")
@@ -275,7 +262,7 @@ def emergency_chat():
 
 @app.route("/")
 def home():
-    return str(json.dumps(session.get("user")))
+    return session.get("user")
 
 
 if __name__ == "__main__":
