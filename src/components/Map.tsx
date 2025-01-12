@@ -13,12 +13,6 @@ type Friend = {
     status: "safe" | "on-the-move" | "pickle";
 };
 
-type APIUser = {
-    name: string;
-    phoneNumber: string;
-    geocode: [number, number];
-    status: "safe" | "on-the-move" | "pickle";
-};
 
 type MapProps = {
     friends: Friend[];
@@ -55,7 +49,6 @@ const HeatmapLayer = ({ data }: { data: [number, number][] }) => {
 };
 
 export default function Map({ friends }: MapProps) {
-    const [users, setUsers] = useState<APIUser[]>([]);
     const [showHeatmap, setShowHeatmap] = useState(true);
 
     const fakeFriends: Friend[] = [
