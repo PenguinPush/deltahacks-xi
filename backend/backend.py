@@ -91,7 +91,7 @@ def callback():
             collection.insert_one(new_user)
             print("B")
 
-    return redirect("/")
+    return redirect("/authorize")
 
 
 @app.route("/login")
@@ -250,7 +250,7 @@ def emergency_chat():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/")
+@app.route("/authorize")
 def dashboard():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
     if not user:
