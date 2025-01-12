@@ -51,19 +51,9 @@ oauth = OAuth(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 # Initialize the emergency assistant
 emergency_assistant = EmergencyAssistant()
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
 oauth.register(
     "auth0",
     client_id=os.getenv("AUTH0_CLIENT_ID"),
@@ -74,16 +64,6 @@ oauth.register(
     server_metadata_url=f'https://{os.getenv("AUTH0_DOMAIN")}/.well-known/openid-configuration',
 )
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 # Add the get_friends_info function here
 def get_friends_info(user_phonenumber):
