@@ -96,7 +96,7 @@ ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
                 connectors=[{"id": "web-search"}],
                 max_tokens=0,  # Set to 0 to remove character limit
             )
-            print("Response received!")
+            print("Response received!", response.text)
             return {
                 "response": response.text
             }
