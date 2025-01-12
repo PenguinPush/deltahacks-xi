@@ -23,7 +23,6 @@ function AppContent() {
     const mainUserPhoneNumber = "+16476369303"; 
     const [mainUser, setMainUser] = useState<Friend | null>(null); 
 
-    // Manually generated friends data
     useEffect(() => {
         const mockFriends: Friend[] = [
             {

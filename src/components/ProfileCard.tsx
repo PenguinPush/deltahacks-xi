@@ -32,7 +32,7 @@ function ProfileCard({
     const toggleStatus = () => {
         const statusOptions: userStatus[] = ["safe", "on-the-move", "pickle"];
         const currentIndex = statusOptions.indexOf(currentStatus);
-        const nextIndex = (currentIndex + 1) % statusOptions.length; // Loop back to the first option
+        const nextIndex = (currentIndex + 1) % statusOptions.length;
         setCurrentStatus(statusOptions[nextIndex]);
     };
 
