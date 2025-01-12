@@ -32,7 +32,7 @@ function AppContent() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const apiUrl = "http://www.picklehelp.us";
+                const apiUrl = "https://www.picklehelp.us";
                 const response = await fetch(`${apiUrl}/api/friends`, {
                     method: "GET",
                     headers: {
@@ -106,7 +106,7 @@ function AppContent() {
             setMainUser(updatedMainUser);
 
             // Optionally send the updated status to the server
-            fetch("http://www.picklehelp.us/api/update-status", {
+            fetch("https://www.picklehelp.us/api/update-status", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
