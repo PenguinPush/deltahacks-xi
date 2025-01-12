@@ -87,13 +87,13 @@ def get_all_users():
     users_list = []
     
     for user in users:
-        user_data = {
+        pickle_data = {
             "name": user["name"],
             "phoneNumber": user["phonenumber"],
             "geocode": user["location"]["coordinates"],
             "status": user["status"]
         }
-        users_list.append(user_data)
+        users_list.append(pickle_data)
     
     return users_list
 

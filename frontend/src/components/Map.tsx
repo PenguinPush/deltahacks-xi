@@ -3,14 +3,20 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 import { useEffect, useState } from "react";
+import SMSButton from "./SMSButton";
 
 type Friend = {
     name: string;
     phoneNumber: string;
     geocode: [number, number];
     popup: string;
-    location: string;
-    distance: string;
+    status: "safe" | "on-the-move" | "pickle";
+};
+
+type APIUser = {
+    name: string;
+    phoneNumber: string;
+    geocode: [number, number];
     status: "safe" | "on-the-move" | "pickle";
 };
 
@@ -38,27 +44,58 @@ const HeatmapLayer = ({ data }: { data: [number, number][] }) => {
 };
 
 export default function Map({ friends }: MapProps) {
-    const [showHeatmap, setShowHeatmap] = useState(true);
+    const [users, setUsers] = useState<APIUser[]>([]); // State for all users
+    const [showHeatmap, setShowHeatmap] = useState(true); // Toggle for heatmap/markers
 
-    const heatmapData: [number, number][] = friends.map((friend) => friend.geocode);
+    useEffect(() => {
+        async function fetchUsers() {
+            try {
+                const response = await fetch("/api/get-all-users");
+                const data: Array<{
+                    name: string;
+                    phoneNumber: string;
+                    location: { coordinates: [number, number] };
+                    status: "safe" | "on-the-move" | "pickle";
+                }> = await response.json();
+
+                const users: APIUser[] = data.map((user) => ({
+                    name: user.name,
+                    phoneNumber: user.phoneNumber,
+                    geocode: user.location.coordinates,
+                    status: user.status,
+                }));
+
+                setUsers(users);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        }
+        fetchUsers();
+    }, []);
+
+    const heatmapData: [number, number][] = users.map((user) => user.geocode);
 
     return (
         <div>
-            <button
-                onClick={() => setShowHeatmap(!showHeatmap)}
-                style={{ marginBottom: "10px", padding: "5px 10px", cursor: "pointer" }}>
-                {showHeatmap ? "Show Friends" : "Show Heatmap"}
-            </button>
-
+            <div className="buttonContainer">
+                <button className="dialogButton"
+                    onClick={() => setShowHeatmap(!showHeatmap)}
+                    style={{ marginBottom: "10px", padding: "5px 10px", cursor: "pointer" }}>
+                    {showHeatmap ? "Show Friends" : "Show Heatmap"}
+                </button>
+                <SMSButton></SMSButton>
+            </div>
             <MapContainer
-                center={[37.7749, -122.4194]}
+                center={[37.7749, -122.4194]} // Center on San Francisco
                 zoom={5}
-                style={{ height: "40vh", width: "90vw", borderRadius:"8px"}}>
+                style={{ height: "40vh", width: "90vw", borderRadius: "8px" }}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                 {showHeatmap ? (
+                    // Heatmap: Show all users
                     <HeatmapLayer data={heatmapData} />
                 ) : (
+                    // Marker view: Show only friends
                     friends.map((friend) => (
                         <Marker key={friend.phoneNumber} position={friend.geocode}>
                             <Popup>

@@ -22,3 +22,8 @@
 .card {
   padding: 2em;
 }
+
+.buttonContainer {
+  display: flex;
+  gap: 32px;
+}
