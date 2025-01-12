@@ -38,20 +38,17 @@ function ManualUpdate({ friends }: { friends: Friend[] }) {
                 <>
                     <div className="overlay" onClick={closeDialog}></div>
                     <div className="dialog-box">
-                        <h2 style={{ color: "Black" }}>Dialog Box</h2>
-                        <p>Dialog box example</p>
-
-                        <form onSubmit={handleFormSubmit}>
+                        <h2 style={{ color: "Black", margin: "0"}}>Dialog Box</h2>
+                        <form className="form" onSubmit={handleFormSubmit}>
                             <label htmlFor="textInput">Enter Text:</label>
                             <input type="text" id="textInput" name="textInput" required />
                             <button type="submit" className="dialogButton">
-                                Submit
+                                Update Locations
                             </button>
-                        </form>
-
-                        <button className="dialogButton" onClick={closeDialog}>
+                            <button className="dialogButton" onClick={closeDialog}>
                             Close
                         </button>
+                        </form>
                     </div>
                 </>
             )}

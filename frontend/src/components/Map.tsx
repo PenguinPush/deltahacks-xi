@@ -36,7 +36,7 @@ export default function Map({ friends, addFriend }: MapProps) {
     return (
         <>
             {location ? (
-                <MapContainer center={location} zoom={13} style={{ height: "100vh", width: "100%" }}>
+                <MapContainer center={location} zoom={13} style={{ height: "40vh", width: "100%", borderRadius: "8px"}}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     {friends.map((friend) => (
                         <Marker key={friend.phoneNumber} position={friend.geocode}>
@@ -65,7 +65,7 @@ export default function Map({ friends, addFriend }: MapProps) {
                     })
                 }
             >
-                Add New Friend
+                Add Test Friend
             </button>
         </>
     );

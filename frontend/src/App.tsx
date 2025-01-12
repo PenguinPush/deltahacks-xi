@@ -3,6 +3,7 @@ import ProfileCard from "./components/ProfileCard";
 import Map from "./components/Map";
 import ManualUpdate from "./components/ManualUpdate";
 import { useState, useEffect } from "react";
+import AddFriendButton from "./components/AddFriendButton";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
 
@@ -36,7 +37,7 @@ function App() {
                 
                 const data = await response.json();
                 
-                const transformedFriends = data.map((friend: any) => ({
+                const transformedFriends = data.map((friend: Friend) => ({
                     name: friend.name,
                     phoneNumber: friend.phoneNumber,
                     geocode: friend.geocode,
@@ -62,17 +63,20 @@ function App() {
 
     return (
         <>
-            <Map friends={friends} addFriend={addFriend} />
-            {friends.map((friend) => (
-                <ProfileCard
-                    key={friend.phoneNumber}
-                    name={friend.name}
-                    location={friend.location}
-                    distance={friend.distance}
-                    status={friend.status}
-                />
-            ))}
-            <ManualUpdate friends={friends}/>
+            <div id="container">
+                <Map friends={friends} addFriend={addFriend}/>
+                <AddFriendButton></AddFriendButton>
+                <ManualUpdate friends={friends}/>
+                {friends.map((friend) => (
+                    <ProfileCard
+                        key={friend.phoneNumber}
+                        name={friend.name}
+                        location={friend.location}
+                        distance={friend.distance}
+                        status={friend.status}
+                    />
+                ))}
+            </div>
         </>
     );
 }

@@ -3,13 +3,13 @@
     justify-content: space-evenly;
     gap: 16px;
     flex-direction: row;
-    outline: 2px solid green;
     padding: 0.5em;
+    border-radius: 8px;
+    background-color: rgba(21, 22, 59, 0.193);
 }
 
 .profile {
     background-color: red;
-    outline: 2px solid rebeccapurple;
     border-radius: 100%;
     font-size: 32px;
     width: 2em;
@@ -37,6 +37,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .status-icon {
