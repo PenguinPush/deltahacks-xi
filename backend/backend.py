@@ -1,6 +1,6 @@
 from flask import Flask, send_from_directory, request, redirect, jsonify
 from flask_cors import CORS
-from twilio.twiml.messaging_response import MessagingResponse
+#from twilio.twiml.messaging_response import MessagingResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
@@ -49,6 +49,30 @@ def get_friends(phone_number):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/friends/add', methods=['POST'])
+def add_friend():
+    try:
+        data = request.get_json()
+        user_phone = data.get('userPhone')
+        friend_phone = data.get('friendPhone')
+        
+        database = client["pickle_data"]
+        collection = database.users
+        
+        # Add friend to user's friends list
+        result = collection.update_one(
+            {"phonenumber": user_phone},
+            {"$addToSet": {"friends": friend_phone}}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({"message": "Friend added successfully"}), 200
+        else:
+            return jsonify({"error": "User not found or friend already added"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
     # Get the message the user sent our Twilio number
@@ -82,6 +106,24 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/api/user/<phone_number>', methods=['GET'])
+def get_user(phone_number):
+    try:
+        database = client["pickle_data"]
+        collection = database.users
+        user = collection.find_one({"phonenumber": phone_number})
+        
+        if user:
+            # Convert ObjectId to string for JSON serialization
+            user['_id'] = str(user['_id'])
+            return jsonify(user), 200
+        else:
+            return jsonify({"error": "User not found"}), 404
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

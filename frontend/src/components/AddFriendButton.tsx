@@ -17,8 +17,8 @@ export default function AddFriendButton() {
 
         try {
             console.log('Sending request with:', {
-                userPhoneNumber: '1234567890',
-                friendPhoneNumber: phoneNumber,
+                userPhone: '1234567890',
+                friendPhone: phoneNumber,
             });
 
             const response = await fetch('http://localhost:5000/api/friends/add', {
@@ -27,8 +27,8 @@ export default function AddFriendButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userPhoneNumber: '1234567890',
-                    friendPhoneNumber: phoneNumber,
+                    userPhone: '1234567890',
+                    friendPhone: phoneNumber,
                 }),
             });
 
