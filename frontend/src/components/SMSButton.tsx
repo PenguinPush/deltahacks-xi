@@ -1,7 +1,25 @@
 export default function SMSButton() {
     const sendSMS = () => {
-        const smsLink = "sms:+12183355420?body=Hello%20there,%20how%20can%20I%20help%20you%20today?";
-        window.location.href = smsLink;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const coordX = position.coords.longitude;
+                const coordY = position.coords.latitude;
+                const status = "safe"; 
+
+                const smsBody = `p/ck/3-${coordX}:${coordY}:${status}`;
+
+                const encodedBody = encodeURIComponent(smsBody);
+
+                const smsLink = `sms:+12183355420?body=${encodedBody}`;
+
+                window.location.href = smsLink;
+            }, (error) => {
+                console.error("Error obtaining location:", error);
+                alert("Unable to retrieve location. Please ensure location services are enabled.");
+            });
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
     };
 
     return (
