@@ -187,7 +187,7 @@ def sms_system():
 
             if result.modified_count > 0:
                 resp.message(str(get_friends_info(from_number)))
-                resp.message("Paste the above message into Pickle!")
+                resp.message("User updated successfully. Paste the message into Pickle!")
             else:
                 resp.message("❌ Could not update location. User not found.")
 

@@ -33,7 +33,7 @@ function AppContent() {
         const fetchFriends = async () => {
             try {
                 const apiUrl = "https://www.picklehelp.us";
-                const response = await fetch(`${apiUrl}/api/friends`, {
+                const response = await fetch(`${apiUrl}/api/users`, {
                     method: "GET",
                     headers: {
                         Accept: "application/json",
