@@ -71,6 +71,7 @@ def callback():
     user_phone_number = session["user"].get("name", None)
 
     if user_phone_number:
+        print("A")
         database = client["pickle_data"]
         collection = database.users
 
@@ -86,6 +87,7 @@ def callback():
             }
 
             collection.insert_one(new_user)
+            print("B")
 
     return redirect("/")
 
