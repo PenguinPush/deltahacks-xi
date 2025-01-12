@@ -64,28 +64,52 @@ def get_friends_info(user_phonenumber):
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    # token = oauth.auth0.authorize_access_token()
-    # session["user"] = token
+    # Get the access token
+    token = oauth.auth0.authorize_access_token()
 
-    oauth.auth0.authorize_access_token()
-    user_info = oauth.auth0.get("userinfo").json()
+    # Fetch user information from Auth0 using the token
+    user_info = oauth.auth0.parse_id_token(token)
 
+    # Log the user info for debugging
+    print("User Info:", user_info)
 
-    # Save or update user in MongoDB
+    # Save or update user data in MongoDB
     users_collection = client.db.users
     existing_user = users_collection.find_one({"user_id": user_info["sub"]})
 
     if not existing_user:
+        # If the user does not exist, insert new user data
         users_collection.insert_one({
             "user_id": user_info["sub"],
-            "phone_number": user_info.get("phone_number"),
             "email": user_info.get("email"),
-            "profile": user_info,
+            "phone_number": user_info.get("phone_number"),
+            "name": user_info.get("name"),
+            "profile": user_info
         })
+    else:
+        # If the user exists, update the user data
+        users_collection.update_one(
+            {"user_id": user_info["sub"]},
+            {"$set": {
+                "email": user_info.get("email"),
+                "phone_number": user_info.get("phone_number"),
+                "name": user_info.get("name"),
+                "profile": user_info
+            }}
+        )
 
+    # Store user info in session
     session["user"] = user_info
-    print(token)
-    return redirect("/")
+
+    return redirect("/dashboard")
+
+
+@app.route("/dashboard")
+def dashboard():
+    user = session.get("user")
+    if not user:
+        return redirect(url_for("login"))
+    return jsonify(user)
 
 
 @app.route("/login")
