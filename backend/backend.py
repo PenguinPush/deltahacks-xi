@@ -6,6 +6,7 @@ from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
 from emergency_assistant import EmergencyAssistant
+import json
 
 load_dotenv()
 
@@ -81,8 +82,37 @@ def add_friend():
 def sms_system():
     # Get the message the user sent our Twilio number
     body = request.values.get('Body', None)
+    # Get the sender's phone number
+    from_number = request.values.get('From', None)
     resp = MessagingResponse()
 
+    # Check if this is a location update message
+    if body and body.startswith("p/ck/3-"):
+        try:
+            # Extract coordinates from the message
+            coords_str = body[7:]  # Remove "p/ck/3-" prefix
+            coords = json.loads(coords_str)  # Convert string to list
+            
+            # Update user's location in database
+            database = client["pickle_data"]
+            collection = database.users
+            result = collection.update_one(
+                {"phonenumber": from_number},
+                {"$set": {"location.coordinates": coords}}
+            )
+            
+            if result.modified_count > 0:
+                resp.message("📍 Location updated successfully!")
+            else:
+                resp.message("❌ Could not update location. User not found.")
+            
+            return str(resp)
+            
+        except Exception as e:
+            resp.message(f"❌ Error updating location: {str(e)}")
+            return str(resp)
+
+    # If not a location update, proceed with normal chatbot response
     resp.message("🥒 Pickling it up...")
 
     # Get response from emergency assistant
