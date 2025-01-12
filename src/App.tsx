@@ -21,13 +21,13 @@ type ApiFriend = {
     name: string;
     phoneNumber: string;
     geocode: [number, number];
-    status: string; // Use string here because the server might return any value
+    status: string;
 };
 
 function AppContent() {
     const [friends, setFriends] = useState<Friend[]>([]);
-    const mainUserPhoneNumber = "+16476369303"; // Main user's phone number (static example)
-    const [mainUser, setMainUser] = useState<Friend | null>(null); // For the main user's details
+    const mainUserPhoneNumber = "+16476369303"; 
+    const [mainUser, setMainUser] = useState<Friend | null>(null); 
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -45,12 +45,10 @@ function AppContent() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                // Expect the API to return an array of ApiFriend
                 const data: ApiFriend[] = await response.json();
 
                 const transformedFriends: Friend[] = data
                     .map((friend) => {
-                        // Validate and transform data into Friend structure
                         if (
                             typeof friend.name === "string" &&
                             typeof friend.phoneNumber === "string" &&
@@ -60,27 +58,25 @@ function AppContent() {
                             typeof friend.geocode[1] === "number" &&
                             typeof friend.status === "string"
                         ) {
-                            // Transform status into userStatus
                             const validStatus = ["safe", "on-the-move", "pickle"].includes(friend.status)
                                 ? (friend.status as userStatus)
-                                : "safe"; // Default to "safe" if invalid
+                                : "safe"; 
 
                             return {
                                 name: friend.name,
                                 phoneNumber: friend.phoneNumber,
                                 geocode: friend.geocode as [number, number],
                                 popup: `${friend.name}'s location`,
-                                location: "", // Empty for now
-                                distance: "", // Empty for now
+                                location: "", 
+                                distance: "", 
                                 status: validStatus,
                             };
                         }
                         console.warn("Invalid friend data:", friend);
-                        return null; // Skip invalid entries
+                        return null;
                     })
-                    .filter((f): f is Friend => f !== null); // Filter out null entries
+                    .filter((f): f is Friend => f !== null); 
 
-                // Separate the main user and their friends
                 const filteredFriends = transformedFriends.filter(
                     (friend) => friend.phoneNumber !== mainUserPhoneNumber
                 );
@@ -92,7 +88,7 @@ function AppContent() {
                 setMainUser(mainUserData || null);
             } catch (error) {
                 console.error("Error fetching friends:", error);
-                setFriends([]); // Reset to empty on error
+                setFriends([]); 
                 setMainUser(null);
             }
         };
@@ -105,7 +101,6 @@ function AppContent() {
             const updatedMainUser = { ...mainUser, status: newStatus };
             setMainUser(updatedMainUser);
 
-            // Optionally send the updated status to the server
             fetch("https://www.picklehelp.us/api/update-status", {
                 method: "POST",
                 headers: {
@@ -123,16 +118,12 @@ function AppContent() {
 
     return (
         <div id="container">
-            {/* Map of friends */}
             <Map friends={friends} />
 
-            {/* Buttons */}
             <AddFriendButton />
 
-            {/* Manual update for friends */}
             <ManualUpdate friends={friends} />
 
-            {/* Display the main user's profile */}
             {mainUser && (
                 <ProfileCard
                     key={mainUser.phoneNumber}
@@ -143,7 +134,6 @@ function AppContent() {
                 />
             )}
 
-            {/* Display friends' profiles */}
             {friends.map((friend) => (
                 <ProfileCard
                     key={friend.phoneNumber}
@@ -154,7 +144,6 @@ function AppContent() {
                 />
             ))}
 
-            {/* Control for main user's status */}
             {mainUser && (
                 <div>
                     <h3>Update Your Status</h3>
