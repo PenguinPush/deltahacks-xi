@@ -269,7 +269,7 @@ def dashboard():
 
 
 # Add new endpoint to get all users
-@app.route('/api/users', methods=['GET'])
+@app.route('/api/users', methods=['POST', 'GET'])
 def get_all_users():
     try:
         database = client["pickle_data"]
