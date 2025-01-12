@@ -3,7 +3,7 @@ import ProfileCard from "./components/ProfileCard";
 import Map from "./components/Map";
 import ManualUpdate from "./components/ManualUpdate";
 import AddFriendButton from "./components/AddFriendButton";
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
 
@@ -26,12 +26,20 @@ type ApiFriend = {
 
 function AppContent() {
     const [friends, setFriends] = useState<Friend[]>([]);
-    const mainUserPhoneNumber = "+16476369303"; 
-    const [mainUser, setMainUser] = useState<Friend | null>(null); 
+    const [mainUser, setMainUser] = useState<Friend | null>(null);
 
     useEffect(() => {
         const fetchFriends = async () => {
             try {
+                const myPhoneResponse = await fetch("https://www.picklehelp.us/phone", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const myPhoneData = await myPhoneResponse.json();
+                const myPhone = myPhoneData;
+                console.log(myPhone);
+
                 const apiUrl = "https://www.picklehelp.us";
                 const response = await fetch(`${apiUrl}/api/users`, {
                     method: "GET",
@@ -60,35 +68,35 @@ function AppContent() {
                         ) {
                             const validStatus = ["safe", "on-the-move", "pickle"].includes(friend.status)
                                 ? (friend.status as userStatus)
-                                : "safe"; 
+                                : "safe";
 
                             return {
                                 name: friend.name,
                                 phoneNumber: friend.phoneNumber,
                                 geocode: friend.geocode as [number, number],
                                 popup: `${friend.name}'s location`,
-                                location: "", 
-                                distance: "", 
+                                location: "",
+                                distance: "",
                                 status: validStatus,
                             };
                         }
                         console.warn("Invalid friend data:", friend);
                         return null;
                     })
-                    .filter((f): f is Friend => f !== null); 
+                    .filter((f): f is Friend => f !== null);
 
                 const filteredFriends = transformedFriends.filter(
-                    (friend) => friend.phoneNumber !== mainUserPhoneNumber
+                    (friend) => friend.phoneNumber !== myPhone
                 );
                 const mainUserData = transformedFriends.find(
-                    (friend) => friend.phoneNumber === mainUserPhoneNumber
+                    (friend) => friend.phoneNumber === myPhone
                 );
 
                 setFriends(filteredFriends);
                 setMainUser(mainUserData || null);
             } catch (error) {
                 console.error("Error fetching friends:", error);
-                setFriends([]); 
+                setFriends([]);
                 setMainUser(null);
             }
         };
@@ -98,7 +106,7 @@ function AppContent() {
 
     const handleUpdateMainUserStatus = (newStatus: userStatus) => {
         if (mainUser) {
-            const updatedMainUser = { ...mainUser, status: newStatus };
+            const updatedMainUser = {...mainUser, status: newStatus};
             setMainUser(updatedMainUser);
 
             fetch("https://www.picklehelp.us/api/update-status", {
@@ -118,11 +126,11 @@ function AppContent() {
 
     return (
         <div id="container">
-            <Map friends={friends} />
+            <Map friends={friends}/>
 
-            <AddFriendButton />
+            <AddFriendButton/>
 
-            <ManualUpdate friends={friends} />
+            <ManualUpdate friends={friends}/>
 
             {mainUser && (
                 <ProfileCard
@@ -157,5 +165,5 @@ function AppContent() {
 }
 
 export default function App() {
-    return <AppContent />;
+    return <AppContent/>;
 }
