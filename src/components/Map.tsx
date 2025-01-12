@@ -64,7 +64,7 @@ export default function Map({ friends }: MapProps) {
     useEffect(() => {
         async function fetchUsers() {
             try {
-                const response = await fetch("http://picklehelp.us/api/users");
+                const response = await fetch("https://picklehelp.us/api/users");
                 if (!response.ok) {
                     // Log the response if it's not OK
                     const text = await response.text();

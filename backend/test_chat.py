@@ -12,7 +12,7 @@ def main():
 
         # Send request to Flask endpoint
         response = requests.post(
-            'http://localhost:5000/api/emergency-chat',
+            'https://www.picklehelp.us/api/emergency-chat',
             json={'message': user_input},
             headers={'Content-Type': 'application/json'}
         )

@@ -17,7 +17,7 @@ export default function AddFriendButton() {
         event.preventDefault();
 
         try {
-            const apiUrl = 'http://localhost:5000';
+            const apiUrl = 'https://www.picklehelp.us';
             console.log('Sending request with:', {
                 userPhone: '1234567890',
                 friendPhone: phoneNumber,
