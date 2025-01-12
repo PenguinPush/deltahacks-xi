@@ -95,7 +95,7 @@ def get_all_users():
         pickle_data = {
             "name": user.get("name", "Unknown"),  
             "phoneNumber": user.get("phonenumber", "N/A"),  
-            "geocode": coordinates,
+            "geocode": user.get["location"]["coordinates"],
             "status": user.get("status", "unknown"),  
         }
         users_list.append(pickle_data)
