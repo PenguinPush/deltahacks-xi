@@ -41,10 +41,10 @@ oauth.register(
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    if path != "" and os.path.exists(f'../frontend/dist/{path}'):
-        return send_from_directory('../frontend/dist', path)
+    if path != "" and os.path.exists(f'../dist/{path}'):
+        return send_from_directory('../dist', path)
     else:
-        return send_from_directory('../frontend/dist', 'index.html')
+        return send_from_directory('../dist', 'index.html')
 
 
 def get_friends_info(user_phonenumber):
