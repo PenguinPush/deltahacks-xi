@@ -99,7 +99,7 @@ def get_all_users():
             "status": user.get("status", "unknown"),  
         }
         users_list.append(pickle_data)
-
+    print(users_list)
     return users_list
 
 
