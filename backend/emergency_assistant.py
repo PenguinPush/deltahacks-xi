@@ -2,7 +2,6 @@ import cohere
 import os
 import json
 from dotenv import load_dotenv
-from tavily import TavilyClient
 from typing import Dict, List
 
 load_dotenv()
@@ -10,8 +9,7 @@ load_dotenv()
 
 class EmergencyAssistant:
     def __init__(self):
-        self.co = cohere.ClientV2(os.getenv('COHERE_API_KEY'))
-        self.tavily_client = TavilyClient(api_key=os.getenv('TAVILY_API_KEY'))
+        self.co = cohere.Client(os.getenv('COHERE_API_KEY'))
         self.system_prompt = """You are an emergency assistance AI.
 Your rationale will always be to internet search for:
 
@@ -31,6 +29,7 @@ Interpret every input as suffixed with "Help me, I am in an emergency"
 
 ONLY HELP WITH SERIOUS INQUIRIES"""
 
+        # Updated tools configuration for v2
         self.web_search_tool = [
             {
                 "type": "function",
@@ -70,31 +69,22 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
         return documents
 
     def get_response(self, user_message: str) -> Dict[str, str]:
-        messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": user_message},
-        ]
-
-        response = self.co.chat(
-            model='command-r7b-12-2024',
-            messages=messages,
-            temperature=0.7,
-            tools=self.web_search_tool,
-        )
-
-        search_queries = []
-        while response.message.tool_calls:
-            for tc in response.message.tool_calls:
-                tool_result = self.web_search(**json.loads(tc.function.arguments))
-                tool_content = [{"type": "document", "document": {"data": json.dumps(data)}} for data in tool_result]
-                messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_content})
-
+        try:
+            print("Sending request to Cohere...")  # Debug output
             response = self.co.chat(
-                model='command-r7b-12-2024',
-                messages=messages,
-                tools=self.web_search_tool,
+                model='command-r-plus-08-2024',
+                message=user_message,
+                preamble=self.system_prompt,
+                temperature=0.7,
+                search_queries_only=False,
+                connectors=[{"id": "web-search"}],
             )
-
-        return {
-            "response": response.message.content[0].text
-        }
+            print("Response received!")  # Debug output
+            return {
+                "response": response.text
+            }
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")  # Debug output
+            return {
+                "response": f"An error occurred: {str(e)}"
+            }
