@@ -5,6 +5,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
+from emergency_assistant import EmergencyAssistant
 
 load_dotenv()
 
@@ -13,6 +14,9 @@ uri = os.getenv('MONGODB_URI')
 app = Flask(__name__, static_folder='../frontend')
 CORS(app, resources={r"/*": {"origins": "*"}})
 client = MongoClient(uri, server_api=ServerApi('1'))
+
+# Initialize the emergency assistant
+emergency_assistant = EmergencyAssistant()
 
 # Add the get_friends_info function here
 def get_friends_info(user_phonenumber):
@@ -79,7 +83,17 @@ def sms_system():
     body = request.values.get('Body', None)
     resp = MessagingResponse()
 
-    resp.message(body.upper())
+    resp.message("🥒 Pickling it up...")
+
+    # Get response from emergency assistant
+    try:
+        assistant_response = emergency_assistant.get_response(body)
+        message_text = assistant_response.get('response', 'Sorry, I could not process your request.')
+    except Exception as e:
+        message_text = f"An error occurred: {str(e)}"
+
+    # Send response back via SMS
+    resp.message(message_text)
 
     return str(resp)
 
@@ -115,6 +129,21 @@ def get_user(phone_number):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Add new endpoint for emergency chat
+@app.route('/api/emergency-chat', methods=['POST'])
+def emergency_chat():
+    try:
+        data = request.get_json()
+        user_message = data.get('message')
+        
+        if not user_message:
+            return jsonify({"error": "No message provided"}), 400
+            
+        response = emergency_assistant.get_response(user_message)
+        return jsonify(response), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT'))
