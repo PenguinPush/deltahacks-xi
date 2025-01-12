@@ -68,16 +68,15 @@ def get_friends_info(user_phonenumber):
         friends_info = []
         for friend_phonenumber in friends_phone_numbers:
             friend = collection.find_one({"phonenumber": friend_phonenumber})
-            if friend: 
-                friends_info.append(friend)
-            else:
-                print(f"Friend with phone number {friend_phonenumber} not found.")
+            if friend:
+                # Transform the data to match the frontend format
+                friend_data = {
+                    "name": friend["name"],
+                    "phoneNumber": friend["phonenumber"],
+                    "geocode": friend["location"]["coordinates"],
+                    "status": friend["status"]
+                }
+                friends_info.append(friend_data)
         
-        if friends_info:
-            print(f"Friends information for {user_phonenumber}:")
-            for friend in friends_info:
-                print(friend)
-        else:
-            print(f"{user_phonenumber} has no friends.")
-    else:
-        print(f"User with phone number {user_phonenumber} not found.")  
+        return friends_info
+    return []

@@ -1,5 +1,6 @@
-from flask import Flask, send_from_directory, request, redirect
-from twilio.twiml.messaging_response import MessagingResponse
+from flask import Flask, send_from_directory, request, redirect, jsonify
+from flask_cors import CORS
+#from twilio.twiml.messaging_response import MessagingResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
@@ -10,8 +11,43 @@ load_dotenv()
 uri = os.getenv('MONGODB_URI')
 
 app = Flask(__name__, static_folder='../frontend')
+CORS(app)
 client = MongoClient(uri, server_api=ServerApi('1'))
 
+# Add the get_friends_info function here
+def get_friends_info(user_phonenumber):
+    database = client["pickle_data"]
+    collection = database.users
+    user = collection.find_one({"phonenumber": user_phonenumber})
+    
+    if user:
+        friends_phone_numbers = user.get("friends", [])
+        
+        friends_info = []
+        for friend_phonenumber in friends_phone_numbers:
+            friend = collection.find_one({"phonenumber": friend_phonenumber})
+            if friend:
+                friend_data = {
+                    "name": friend["name"],
+                    "phoneNumber": friend["phonenumber"],
+                    "geocode": friend["location"]["coordinates"],
+                    "status": friend["status"]
+                }
+                friends_info.append(friend_data)
+        
+        return friends_info
+    return []
+
+# Add the new friends endpoint
+@app.route('/api/friends/<phone_number>')
+def get_friends(phone_number):
+    try:
+        friends = get_friends_info(phone_number)
+        response = jsonify(friends)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
