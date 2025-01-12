@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export default function AddFriendButton() {
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const openDialog = () => {
         setDialogOpen(true);
@@ -11,10 +12,44 @@ export default function AddFriendButton() {
         setDialogOpen(false);
     };
 
-    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const textInputValue = (event.currentTarget.elements.namedItem("textInput") as HTMLInputElement).value;
-        console.log("Form submitted with input:", textInputValue);
+
+        try {
+            console.log('Sending request with:', {
+                userPhoneNumber: '1234567890',
+                friendPhoneNumber: phoneNumber,
+            });
+
+            const response = await fetch('http://localhost:5000/api/friends/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userPhoneNumber: '1234567890',
+                    friendPhoneNumber: phoneNumber,
+                }),
+            });
+
+            const data = await response.json();
+            console.log('Response:', data);
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP error! status: ${response.status}`);
+            }
+
+            setPhoneNumber('');
+            closeDialog();
+            alert('Friend request sent successfully!');
+        } catch (error) {
+            console.error('Detailed error:', error);
+            if (error instanceof Error) {
+                alert(`Failed to add friend: ${error.message}`);
+            } else {
+                alert('Failed to add friend: An unknown error occurred');
+            }
+        }
     };
 
     return (
@@ -27,16 +62,26 @@ export default function AddFriendButton() {
                 <>
                     <div className="overlay" onClick={closeDialog}></div>
                     <div className="dialog-box">
-                        <h2 style={{ color: "Black", margin: "0"}}>Dialog Box</h2>
+                        <h2 style={{ color: "Black", margin: "0" }}>Add Friend</h2>
                         <form className="form" onSubmit={handleFormSubmit}>
-                            <label htmlFor="textInput">Enter Text:</label>
-                            <input type="text" id="textInput" name="textInput" required />
-                            <button type="submit" className="dialogButton">
-                                Add Friend
-                            </button>
-                            <button className="dialogButton" onClick={closeDialog}>
-                            Close
-                        </button>
+                            <label htmlFor="phoneInput">Enter Friend's Phone Number:</label>
+                            <input
+                                type="tel"
+                                id="phoneInput"
+                                name="phoneInput"
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                                placeholder="Enter phone number"
+                                required
+                            />
+                            <div className="dialog-buttons">
+                                <button type="submit" className="dialogButton">
+                                    Send Request
+                                </button>
+                                <button type="button" className="dialogButton" onClick={closeDialog}>
+                                    Close
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </>
