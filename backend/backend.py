@@ -278,7 +278,7 @@ def dashboard():
         return "null"
     else:
         phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-    return phone_number
+        return str(phone_number)
 
 
 # Add new endpoint to get all users
