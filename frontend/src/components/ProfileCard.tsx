@@ -54,10 +54,7 @@ function ProfileCard({
             <div className="status" onClick={toggleStatus} style={{ cursor: "pointer" }}>
                 <span
                     className="status-icon"
-                    style={{
-                        backgroundColor: color,
-                    }}
-                ></span>
+                    style={{backgroundColor: color}}/>
                 <span className="status-label" style={{ color }}>
                     {label}
                 </span>

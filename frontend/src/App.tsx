@@ -4,6 +4,7 @@ import Map from "./components/Map";
 import ManualUpdate from "./components/ManualUpdate";
 import { useState, useEffect } from "react";
 import AddFriendButton from "./components/AddFriendButton";
+import SMSButton from "./components/SMSButton";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
 
@@ -62,6 +63,7 @@ function App() {
         <>
             <div id="container">
                 <Map friends={friends}/>
+                <SMSButton></SMSButton>
                 <AddFriendButton></AddFriendButton>
                 <ManualUpdate friends={friends}/>
                 {friends.map((friend) => (
