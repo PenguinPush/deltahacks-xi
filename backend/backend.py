@@ -67,8 +67,8 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    oauth.authorize_access_token()
-    user_info = oauth.get("userinfo").json()
+    oauth.auth0.authorize_access_token()
+    user_info = oauth.auth0.get("userinfo").json()
 
     # Save or update user in MongoDB
     users_collection = client.db.users
