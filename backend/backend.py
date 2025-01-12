@@ -82,6 +82,7 @@ def callback():
                 "phonenumber": user_phone_number,
                 "name": user_phone_number,
                 "friends": [],
+                "friendrequests": [],
                 "location": {"coordinates": []},
                 "status": 0
             }
@@ -254,7 +255,9 @@ def emergency_chat():
 
 @app.route("/")
 def dashboard():
-    user = session.get("user")
+    user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
+    phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
+    print(phone_number)
     if not user:
         return redirect(url_for("login"))
     return jsonify(user)
