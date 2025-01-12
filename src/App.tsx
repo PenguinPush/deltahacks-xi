@@ -17,12 +17,6 @@ type Friend = {
     status: userStatus;
 };
 
-type ApiFriend = {
-    name: string;
-    phoneNumber: string;
-    geocode: [number, number];
-    status: string;
-};
 
 function AppContent() {
     const [friends, setFriends] = useState<Friend[]>([]);
