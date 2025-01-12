@@ -68,9 +68,10 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    user_phone_number = session["user"].get("name", None)
+    user_phone_number = session["user"]["userinfo"]["name"]
 
     if user_phone_number:
+        print("A")
         database = client["pickle_data"]
         collection = database.users
 
@@ -81,11 +82,13 @@ def callback():
                 "phonenumber": user_phone_number,
                 "name": user_phone_number,
                 "friends": [],
+                "friendrequests": [],
                 "location": {"coordinates": []},
                 "status": 0
             }
 
             collection.insert_one(new_user)
+            print("B")
 
     return redirect("/")
 
@@ -106,7 +109,7 @@ def logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("home", _external=True),
+                "returnTo": url_for("dashboard", _external=True),
                 "client_id": os.environ.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
@@ -251,8 +254,13 @@ def emergency_chat():
 
 
 @app.route("/")
-def home():
-    return session.get("user")
+def dashboard():
+    user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
+    phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
+    print(phone_number)
+    if not user:
+        return redirect(url_for("login"))
+    return jsonify(user)
 
 
 if __name__ == "__main__":
