@@ -69,22 +69,22 @@ def callback():
     session["user"] = token
 
     # Extract user information from the token
-    user_info = oauth.auth0.parse_id_token(token)
-    user_phone_number = user_info.get("phone_number", None)
+    user_info = oauth.auth0.parse_id_token(token, nonce=token["nonce"])
+    user_phonenumber = user_info.get("phonenumber", None)
     user_name = user_info.get("name", "Unknown")
 
-    if user_phone_number:
+    if user_phonenumber:
         # Check if user already exists in the MongoDB database
         database = client["pickle_data"]
         collection = database.users
 
-        existing_user = collection.find_one({"phone_number": user_phone_number})
+        existing_user = collection.find_one({"phonenumber": user_phonenumber})
 
         if not existing_user:
             # If the user doesn't exist, create a new user
             new_user = {
                 "name": user_name,
-                "phone_number": user_phone_number,
+                "phonenumber": user_phonenumber,
                 "friends": [],  # Initially no friends
                 "location": {"coordinates": []},  # Initially no location
                 "status": "safe",  # Default status
