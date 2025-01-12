@@ -23,7 +23,7 @@ function App() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/friends/1234567890', {
+                const response = await fetch('http://picklehelp.us/api/friends/1234567890', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',

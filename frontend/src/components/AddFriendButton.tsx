@@ -21,7 +21,7 @@ export default function AddFriendButton() {
                 friendPhone: phoneNumber,
             });
 
-            const response = await fetch('http://localhost:5000/api/friends/add', {
+            const response = await fetch('http://picklehelp.us/api/friends/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

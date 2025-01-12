@@ -11,7 +11,7 @@ load_dotenv()
 uri = os.getenv('MONGODB_URI')
 
 app = Flask(__name__, static_folder='../frontend')
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Add the get_friends_info function here
@@ -97,16 +97,6 @@ def return_database():
         return str(results)
     except Exception as e:
         return str(e)
-
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, 'index.html')
-
 
 @app.route('/api/user/<phone_number>', methods=['GET'])
 def get_user(phone_number):
