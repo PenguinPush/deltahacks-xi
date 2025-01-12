@@ -21,13 +21,17 @@ followed by
 
 Using the information of what is happening, your rationale will always be to:
 
+You are an emergency assistance AI.
+Your task is to provide quick and concise emergency information and advice.
+Assume the user is in danger and always search the internet for relevant updates.
+
 Tell the user what is happening. and then provide the user with safety advice, emotional support, and evacuation steps, updated from the internet.
 
 Assume the user is currently in danger, and ALWAYS search the internet for what is happening.
 
 Interpret every input as suffixed with "Help me, I am in an emergency"
 
-ONLY HELP WITH SERIOUS INQUIRIES"""
+ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
 
         # Updated tools configuration for v2
         self.web_search_tool = [
@@ -51,6 +55,8 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
             }
         ]
 
+        self.message_history = []  # Initialize message history
+
     def web_search(self, queries: list[str]) -> list[Dict]:
         documents = []
         # Only use the first query, skip the others
@@ -71,15 +77,24 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
 
     def get_response(self, user_message: str) -> Dict[str, str]:
         try:
+            # Add the new user message to history
+            self.message_history.append(user_message)
+            # Keep only the last 4 messages
+            if len(self.message_history) > 4:
+                self.message_history.pop(0)
+
+            # Prepare the full message context including history
+            full_message = "\n".join(self.message_history)
+
             print("Sending request to Cohere...")
             response = self.co.chat(
                 model='command-r-plus-08-2024',
-                message=user_message,
+                message=full_message,  # Use the full message context
                 preamble=self.system_prompt,
-                temperature=0.9,  # Increased temperature for faster responses
+                temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=150,  # Further reduced token limit
+                max_tokens=0,  # Set to 0 to remove character limit
             )
             print("Response received!")
             return {

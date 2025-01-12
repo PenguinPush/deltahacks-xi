@@ -1,15 +1,16 @@
+import json
 import os
 from urllib.parse import quote_plus, urlencode
+
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, jsonify, render_template
+from flask import Flask, redirect, session, url_for, request, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
-import json
+
 from emergency_assistant import EmergencyAssistant
-import json
 
 load_dotenv()
 
@@ -67,23 +68,25 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    # oauth.auth0.authorize_access_token()
-    # user_info = oauth.auth0.get("userinfo").json()
-    #
-    # # Save or update user in MongoDB
-    # users_collection = client.db.users
-    # existing_user = users_collection.find_one({"user_id": user_info["sub"]})
-    #
-    # if not existing_user:
-    #     users_collection.insert_one({
-    #         "user_id": user_info["sub"],
-    #         "phone_number": user_info.get("phone_number"),
-    #         "email": user_info.get("email"),
-    #         "profile": user_info,
-    #     })
-    #
-    # session["user"] = user_info
-    print(token)
+    user_phone_number = session["user"].get("name", None)
+
+    if user_phone_number:
+        database = client["pickle_data"]
+        collection = database.users
+
+        existing_user = collection.find_one({"phonenumber": user_phone_number})
+
+        if not existing_user:
+            new_user = {
+                "phonenumber": user_phone_number,
+                "name": user_phone_number,
+                "friends": [],
+                "location": {"coordinates": []},
+                "status": 0
+            }
+
+            collection.insert_one(new_user)
+
     return redirect("/")
 
 
@@ -249,7 +252,7 @@ def emergency_chat():
 
 @app.route("/")
 def home():
-    return str(json.dumps(session.get("user")))
+    return session.get("user")
 
 
 if __name__ == "__main__":
