@@ -7,7 +7,7 @@ from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
-import jwt
+import json
 from emergency_assistant import EmergencyAssistant
 import json
 
@@ -64,79 +64,10 @@ def get_friends_info(user_phonenumber):
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    # Get the access token
     token = oauth.auth0.authorize_access_token()
+    session["user"] = token
 
-    # Fetch user information from Auth0 using the token
-    user_info = oauth.auth0.parse_id_token(token)
-
-    # Validate ID token with nonce
-    id_token = token.get("id_token")
-    nonce = session.get("nonce")  # Retrieve nonce from the session
-
-    if not nonce or not validate_id_token(id_token, nonce):
-        return "Invalid token or nonce mismatch", 400
-
-    # Log the user info for debugging
-    print("User Info:", user_info)
-
-    # Save or update user data in MongoDB
-    users_collection = mongo.db.users
-    existing_user = users_collection.find_one({"user_id": user_info["sub"]})
-
-    if not existing_user:
-        # If the user does not exist, insert new user data
-        users_collection.insert_one({
-            "user_id": user_info["sub"],
-            "email": user_info.get("email"),
-            "phone_number": user_info.get("phone_number"),
-            "name": user_info.get("name"),
-            "profile": user_info
-        })
-    else:
-        # If the user exists, update the user data
-        users_collection.update_one(
-            {"user_id": user_info["sub"]},
-            {"$set": {
-                "email": user_info.get("email"),
-                "phone_number": user_info.get("phone_number"),
-                "name": user_info.get("name"),
-                "profile": user_info
-            }}
-        )
-
-    # Store user info in session
-    session["user"] = user_info
-
-    return redirect("/dashboard")
-
-
-def validate_id_token(id_token, nonce):
-    """
-    Validate the ID token by checking the nonce and verifying the token signature.
-    """
-    try:
-        # Decode and verify the token signature with the Auth0 public key
-        payload = jwt.decode(
-            id_token,
-            algorithms=["RS256"],
-            audience=os.getenv("AUTH0_CLIENT_ID"),
-            issuer=f"https://{os.getenv('AUTH0_DOMAIN')}/",
-            options={"verify_exp": True}
-        )
-
-        # Ensure the nonce matches
-        if payload.get("nonce") != nonce:
-            return False
-
-        return True
-    except jwt.ExpiredSignatureError:
-        return False
-    except jwt.JWTClaimsError:
-        return False
-    except Exception as e:
-        print(f"Error verifying token: {e}")
-        return False
+    return redirect("/")
 
 
 @app.route("/login")
