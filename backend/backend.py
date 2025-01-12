@@ -16,7 +16,7 @@ load_dotenv()
 
 uri = os.getenv('MONGODB_URI')
 
-app = Flask(__name__, static_folder="../dist")
+app = Flask(__name__)
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
 oauth = OAuth(app)
