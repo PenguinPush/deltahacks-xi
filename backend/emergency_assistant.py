@@ -94,7 +94,7 @@ ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
                 temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=75,  # Reduced token limit for shorter responses
+                max_tokens=0,  # Set to 0 to remove character limit
             )
             print("Response received!")
             return {
