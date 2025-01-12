@@ -1,4 +1,5 @@
 import { useState } from "react";
+import './AddFriendButton.css'
 
 export default function AddFriendButton() {
     const [isDialogOpen, setDialogOpen] = useState(false);
