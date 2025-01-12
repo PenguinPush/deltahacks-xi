@@ -86,7 +86,7 @@ def logout():
         + urlencode(
             {
                 "returnTo": url_for("home", _external=True),
-                "client_id": env.get("AUTH0_CLIENT_ID"),
+                "client_id": os.environ.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
         )
