@@ -21,7 +21,7 @@ app.secret_key = os.getenv("APP_SECRET_KEY")
 
 oauth = OAuth(app)
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "https://www.picklehelp.us"}})
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 # Initialize the emergency assistant
@@ -261,7 +261,7 @@ def emergency_chat():
 def dashboard():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
     if not user:
-        return redirect(url_for("login"))
+        return url_for("login")
     else:
         phone_number = session.get("user")["userinfo"][
             "name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
