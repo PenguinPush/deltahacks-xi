@@ -62,36 +62,62 @@ def get_friends_info(user_phonenumber):
     return []
 
 
+@app.route("/login")
+def login():
+    redirect_uri = url_for("callback", _external=True)
+    nonce = oauth.auth0.create_nonce()
+    session["nonce"] = nonce
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=redirect_uri,
+        nonce=nonce
+    )
+
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
-    session["user"] = token
+    nonce = session.pop("nonce", None)
+    if not nonce:
+        return "Nonce not found in session", 400
 
-    oauth.auth0.authorize_access_token()
-    user_info = oauth.auth0.get("userinfo").json()
+    user_info = oauth.auth0.parse_id_token(token, nonce=nonce)
 
-    # Save or update user in MongoDB
+    # Log the user info for debugging
+    print("User Info:", user_info)
+
+    # Save or update user data in MongoDB
     users_collection = client.db.users
     existing_user = users_collection.find_one({"user_id": user_info["sub"]})
 
     if not existing_user:
         users_collection.insert_one({
             "user_id": user_info["sub"],
-            "phone_number": user_info.get("phone_number"),
             "email": user_info.get("email"),
-            "profile": user_info,
+            "phone_number": user_info.get("phone_number"),
+            "name": user_info.get("name"),
+            "profile": user_info
         })
+    else:
+        users_collection.update_one(
+            {"user_id": user_info["sub"]},
+            {"$set": {
+                "email": user_info.get("email"),
+                "phone_number": user_info.get("phone_number"),
+                "name": user_info.get("name"),
+                "profile": user_info
+            }}
+        )
 
     session["user"] = user_info
-    print(user_info)
-    return redirect("/")
+
+    return redirect("/dashboard")
 
 
-@app.route("/login")
-def login():
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
+@app.route("/dashboard")
+def dashboard():
+    user = session.get("user")
+    if not user:
+        return redirect(url_for("login"))
+    return jsonify(user)
 
 
 @app.route("/logout")
