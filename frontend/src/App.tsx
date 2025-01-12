@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import ProfileCard from "./components/ProfileCard";
 import Map from "./components/Map";
@@ -19,6 +18,10 @@ type Friend = {
     distance: string;
     status: userStatus;
 };
+
+const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
+const auth0Client = import.meta.env.VITE_AUTH0_CLIENT_ID;
+
 
 function AppContent() {
     const { isAuthenticated, loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0();
@@ -102,8 +105,8 @@ function AppContent() {
 export default function App() {
     return (
         <Auth0Provider
-            domain="your-auth0-domain.auth0.com"
-            clientId="your-auth0-client-id"
+            domain={auth0Domain}
+            clientId={auth0Client}
             authorizationParams={{
                 redirect_uri: window.location.origin,
             }}
