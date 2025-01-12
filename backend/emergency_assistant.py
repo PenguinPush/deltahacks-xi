@@ -21,6 +21,10 @@ followed by
 
 Using the information of what is happening, your rationale will always be to:
 
+You are an emergency assistance AI.
+Your task is to provide quick and concise emergency information and advice.
+Assume the user is in danger and always search the internet for relevant updates.
+
 Tell the user what is happening. and then provide the user with safety advice, emotional support, and evacuation steps, updated from the internet.
 
 Assume the user is currently in danger, and ALWAYS search the internet for what is happening.
@@ -90,7 +94,7 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
                 temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=150,
+                max_tokens=75,  # Reduced token limit for shorter responses
             )
             print("Response received!")
             return {
