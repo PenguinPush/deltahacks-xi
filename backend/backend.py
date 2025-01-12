@@ -257,8 +257,7 @@ def dashboard():
         return redirect(url_for("login"))
     else:
         phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-        print(phone_number)
-    return jsonify(user)
+    return phone_number
 
 # Add new endpoint to get all users
 @app.route('/api/users', methods=['GET'])
