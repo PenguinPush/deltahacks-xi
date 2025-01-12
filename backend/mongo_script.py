@@ -87,7 +87,7 @@ def get_all_users():
     users_list = []
     
     for user in users:
-        user_data = {
+        pickle_data = {
             "name": user["name"],
             "phoneNumber": user["phonenumber"],
             "geocode": user["location"]["coordinates"],
