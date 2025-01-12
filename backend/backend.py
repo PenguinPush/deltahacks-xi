@@ -165,10 +165,11 @@ def sms_system():
     if body and body.startswith("p/ck/3-"):
         try:
             # p/ck/3-coordx:coordy:status
+            # phonenumber:name:coordx:coordy:status-
 
             data_str = body[7:]
             data = data_str.split(":")
-            data = [float(data[0]), float(data[1]), int(data[2])]
+            data = [float(data[0]), float(data[1]), str(data[2])]
 
             database = client["pickle_data"]
             collection = database.users
@@ -179,6 +180,7 @@ def sms_system():
 
             if result.modified_count > 0:
                 resp.message(str(get_friends_info(from_number)))
+                resp.message("Paste the above message into Pickle!")
             else:
                 resp.message("❌ Could not update location. User not found.")
 
