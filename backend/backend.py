@@ -77,6 +77,7 @@ def callback():
     session["user"] = token
 
     user_phone_number = session["user"]["userinfo"]["name"]
+    user_phone_number = int(str(user_phone_number[-10:-1]) + str(user_phone_number[-1]))
 
     if user_phone_number:
         print("A")
