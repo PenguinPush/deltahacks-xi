@@ -26,14 +26,14 @@ type ApiFriend = {
 
 function AppContent() {
     const [friends, setFriends] = useState<Friend[]>([]);
-    const mainUserPhoneNumber = "+1234567890"; // Main user's phone number (static example)
+    const mainUserPhoneNumber = "+16476369303"; // Main user's phone number (static example)
     const [mainUser, setMainUser] = useState<Friend | null>(null); // For the main user's details
 
     useEffect(() => {
         const fetchFriends = async () => {
             try {
                 const apiUrl = "https://www.picklehelp.us";
-                const response = await fetch(`${apiUrl}/api/friends`, {
+                const response = await fetch(`${apiUrl}/api/users`, {
                     method: "GET",
                     headers: {
                         Accept: "application/json",
