@@ -62,13 +62,24 @@ def get_friends_info(user_phonenumber):
     return []
 
 
+@app.route("/login")
+def login():
+    redirect_uri = url_for("callback", _external=True)
+    nonce = oauth.auth0.create_nonce()
+    session["nonce"] = nonce
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=redirect_uri,
+        nonce=nonce
+    )
+
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    # Get the access token
     token = oauth.auth0.authorize_access_token()
+    nonce = session.pop("nonce", None)
+    if not nonce:
+        return "Nonce not found in session", 400
 
-    # Fetch user information from Auth0 using the token
-    user_info = oauth.auth0.parse_id_token(token)
+    user_info = oauth.auth0.parse_id_token(token, nonce=nonce)
 
     # Log the user info for debugging
     print("User Info:", user_info)
@@ -78,7 +89,6 @@ def callback():
     existing_user = users_collection.find_one({"user_id": user_info["sub"]})
 
     if not existing_user:
-        # If the user does not exist, insert new user data
         users_collection.insert_one({
             "user_id": user_info["sub"],
             "email": user_info.get("email"),
@@ -87,7 +97,6 @@ def callback():
             "profile": user_info
         })
     else:
-        # If the user exists, update the user data
         users_collection.update_one(
             {"user_id": user_info["sub"]},
             {"$set": {
@@ -98,7 +107,6 @@ def callback():
             }}
         )
 
-    # Store user info in session
     session["user"] = user_info
 
     return redirect("/dashboard")
@@ -110,13 +118,6 @@ def dashboard():
     if not user:
         return redirect(url_for("login"))
     return jsonify(user)
-
-
-@app.route("/login")
-def login():
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
 
 
 @app.route("/logout")
