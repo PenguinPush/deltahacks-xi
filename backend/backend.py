@@ -31,6 +31,14 @@ from authlib.integrations.flask_client import OAuth
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, redirect, render_template, session, url_for
 
+import json
+from os import environ as env
+from urllib.parse import quote_plus, urlencode
+
+from authlib.integrations.flask_client import OAuth
+from dotenv import find_dotenv, load_dotenv
+from flask import Flask, redirect, render_template, session, url_for
+
 load_dotenv()
 
 uri = os.getenv('MONGODB_URI')
@@ -46,9 +54,12 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # Initialize the emergency assistant
 emergency_assistant = EmergencyAssistant()
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -65,6 +76,9 @@ oauth.register(
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
