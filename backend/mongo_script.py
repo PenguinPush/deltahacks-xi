@@ -85,17 +85,21 @@ def get_friends_info(user_phonenumber):
 def get_all_users():
     users = collection.find({})
     users_list = []
-    
+
     for user in users:
+        location = user.get("location", {})
+        coordinates = location.get("coordinates", [0.0, 0.0])  
+
         pickle_data = {
-            "name": user["name"],
-            "phoneNumber": user["phonenumber"],
-            "geocode": user["location"]["coordinates"],
-            "status": user["status"]
+            "name": user.get("name", "Unknown"),  
+            "phoneNumber": user.get("phonenumber", "N/A"),  
+            "geocode": coordinates,
+            "status": user.get("status", "unknown"),  
         }
         users_list.append(pickle_data)
-    
+
     return users_list
+
 
 
 #Update your own status
@@ -111,3 +115,7 @@ def update_user_status(phonenumber, new_status):
     else:
         print(f"User {phonenumber} not found or status unchanged")
         return False
+    
+    
+
+get_all_users()

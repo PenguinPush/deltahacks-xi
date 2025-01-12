@@ -50,20 +50,27 @@ export default function Map({ friends }: MapProps) {
     useEffect(() => {
         async function fetchUsers() {
             try {
-                const response = await fetch("/api/get-all-users");
+                const response = await fetch("http://127.0.0.1:5000/api/users");
+                if (!response.ok) {
+                    // Log the response if it's not OK
+                    const text = await response.text();
+                    console.error("Error fetching users:", text);
+                    return;
+                }
                 const data: Array<{
                     name: string;
                     phoneNumber: string;
-                    location: { coordinates: [number, number] };
+                    geocode: [number, number];
                     status: "safe" | "on-the-move" | "pickle";
                 }> = await response.json();
 
                 const users: APIUser[] = data.map((user) => ({
-                    name: user.name,
-                    phoneNumber: user.phoneNumber,
-                    geocode: user.location.coordinates,
-                    status: user.status,
+                    name: user.name || "Unknown",
+                    phoneNumber: user.phoneNumber || "N/A",
+                    geocode: user.geocode || [0.0, 0.0],
+                    status: user.status || "unknown",
                 }));
+                
 
                 setUsers(users);
             } catch (error) {

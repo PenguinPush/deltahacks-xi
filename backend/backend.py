@@ -118,7 +118,7 @@ def logout():
 
 
 # Add the new friends endpoint
-@app.route('/api/friends/<phone_number>')
+@app.route('/api/friends/<phone_number>', methods=['GET'])
 def get_friends(phone_number):
     try:
         friends = get_friends_info(phone_number)
@@ -227,7 +227,6 @@ def get_user(phone_number):
         user = collection.find_one({"phonenumber": phone_number})
 
         if user:
-            # Convert ObjectId to string for JSON serialization
             user['_id'] = str(user['_id'])
             return jsonify(user), 200
         else:
@@ -262,7 +261,29 @@ def dashboard():
         return redirect(url_for("login"))
     return jsonify(user)
 
+# Add new endpoint to get all users
+@app.route('/api/users', methods=['GET'])
+def get_all_users():
+    try:
+        database = client["pickle_data"]
+        collection = database.users
+        users = collection.find({})
+        users_list = []
+
+        for user in users:
+            user_data = {
+                "name": user["name"],
+                "phoneNumber": user["phonenumber"],
+                "geocode": user["location"]["coordinates"],
+                "status": user["status"]
+            }
+            users_list.append(user_data)
+
+        return jsonify(users_list), 200  # Return the list of users as JSON
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
-    port = int(os.getenv('PORT'))
+    port = int(os.getenv('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
