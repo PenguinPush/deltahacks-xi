@@ -76,17 +76,12 @@ def add_friend():
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
     # Get the message the user sent our Twilio number
-    try:
-        database = client["pickle_data"]
-        users = database.users.find({})
-        results = []
+    body = request.values.get('Body', None)
+    resp = MessagingResponse()
 
-        for user in users:
-            results.append(user["name"])
+    resp.message(body.upper())
 
-        return str(results)
-    except Exception as e:
-        return str(e)
+    return str(resp)
 
 
 @app.route("/mongodb")
