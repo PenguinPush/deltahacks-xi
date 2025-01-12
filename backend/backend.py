@@ -165,16 +165,17 @@ def sms_system():
     # Check if this is a location update message
     if body and body.startswith("p/ck/3-"):
         try:
-            # Extract coordinates from the message
-            coords_str = body[7:]  # Remove "p/ck/3-" prefix
-            coords = json.loads(coords_str)  # Convert string to list
-            
-            # Update user's location in database
+            # p/ck/3-phonenumber:name:coordx:coordy:status
+
+            data_str = body[7:]
+            data = data_str.split(":")
+            print(data, from_number)
+
             database = client["pickle_data"]
             collection = database.users
             result = collection.update_one(
                 {"phonenumber": from_number},
-                {"$set": {"location.coordinates": coords}}
+                {"$set": {"location.coordinates": coords},}
             )
             
             if result.modified_count > 0:
@@ -188,17 +189,12 @@ def sms_system():
             resp.message(f"❌ Error updating location: {str(e)}")
             return str(resp)
 
-    # If not a location update, proceed with normal chatbot response
-    resp.message("🥒 Pickling it up...")
-
-    # Get response from emergency assistant
     try:
         assistant_response = emergency_assistant.get_response(body)
         message_text = assistant_response.get('response', 'Sorry, I could not process your request.')
     except Exception as e:
         message_text = f"An error occurred: {str(e)}"
 
-    # Send response back via SMS
     resp.message(message_text)
 
     return str(resp)
