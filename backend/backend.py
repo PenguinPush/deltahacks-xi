@@ -1,14 +1,13 @@
 import os
 from urllib.parse import quote_plus, urlencode
-
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, jsonify
+from flask import Flask, redirect, session, url_for, request, jsonify, render_template
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
-
+import json
 from emergency_assistant import EmergencyAssistant
 
 load_dotenv()
@@ -136,8 +135,6 @@ def sms_system():
     body = request.values.get('Body', None)
     resp = MessagingResponse()
 
-    resp.message("🥒 Pickling it up...")
-
     # Get response from emergency assistant
     try:
         assistant_response = emergency_assistant.get_response(body)
@@ -198,6 +195,12 @@ def emergency_chat():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/")
+def home():
+    return str(json.dumps(session.get("user")))
+
 
 if __name__ == "__main__":
     port = int(os.getenv('PORT'))
