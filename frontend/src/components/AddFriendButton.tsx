@@ -16,12 +16,13 @@ export default function AddFriendButton() {
         event.preventDefault();
 
         try {
+            const apiUrl = 'http://localhost:5000'
             console.log('Sending request with:', {
                 userPhone: '1234567890',
                 friendPhone: phoneNumber,
             });
 
-            const response = await fetch('http://picklehelp.us/api/friends/add', {
+            const response = await fetch(`${apiUrl}/api/friends/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

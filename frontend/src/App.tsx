@@ -23,20 +23,21 @@ function App() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const response = await fetch('http://picklehelp.us/api/friends/1234567890', {
+                const apiUrl = 'http://localhost:5000';
+                const response = await fetch(`${apiUrl}/api/friends/1234567890`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     }
                 });
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                
+
                 const transformedFriends = data.map((friend: Friend) => ({
                     name: friend.name,
                     phoneNumber: friend.phoneNumber,
@@ -46,7 +47,7 @@ function App() {
                     distance: "", // Empty for now
                     status: friend.status as userStatus
                 }));
-                
+
                 setFriends(transformedFriends);
             } catch (error) {
                 console.error('Error fetching friends:', error);
