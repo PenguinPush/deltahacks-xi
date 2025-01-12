@@ -156,9 +156,7 @@ def add_friend():
 
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
-    # Get the message the user sent our Twilio number
     body = request.values.get('Body', None)
-    # Get the sender's phone number
     from_number = request.values.get('From', None)
     resp = MessagingResponse()
 
@@ -175,7 +173,7 @@ def sms_system():
             collection = database.users
             result = collection.update_one(
                 {"phonenumber": from_number},
-                {"$set": {"location.coordinates": coords},}
+                {"$set": {"location.coordinates": 'coord'},}
             )
             
             if result.modified_count > 0:
