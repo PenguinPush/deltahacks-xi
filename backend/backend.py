@@ -3,7 +3,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, send_from_directory, jsonify
+from flask import Flask, Response, redirect, session, url_for, request, send_from_directory, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -278,7 +278,7 @@ def dashboard():
         return "null"
     else:
         phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-        return str(phone_number)
+        return Response(phone_number, mimetype='text/plain')
 
 
 # Add new endpoint to get all users

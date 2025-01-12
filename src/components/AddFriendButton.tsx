@@ -20,10 +20,8 @@ export default function AddFriendButton() {
             method: 'POST'
         });
 
-        console.log(await myPhoneResponse)
-
-        const myPhoneData = await myPhoneResponse.json();
-        const myPhone = myPhoneData;
+        const myPhone = await myPhoneResponse.text();
+        console.log(myPhone)
 
         try {
             const apiUrl = 'https://www.picklehelp.us';
