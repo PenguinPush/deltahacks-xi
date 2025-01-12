@@ -68,31 +68,24 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    print(session["user"]['userinfo'])
+    user_phone_number = session["user"].get("name", None)
 
-    # if user_phone_number:
-    #     # Check if user already exists in the MongoDB database
-    #     database = client["pickle_data"]
-    #     collection = database.users
-    #
-    #     existing_user = collection.find_one({"phone_number": user_phone_number})
-    #
-    #     if not existing_user:
-    #         # If the user doesn't exist, create a new user
-    #         new_user = {
-    #             "name": user_name,
-    #             "phone_number": user_phone_number,
-    #             "friends": [],  # Initially no friends
-    #             "location": {"coordinates": []},  # Initially no location
-    #             "status": "safe",  # Default status
-    #             "sid": session["user"].get("sid", None)  # Use the session sid for authentication
-    #         }
-    #
-    #         # Insert new user into the database
-    #         collection.insert_one(new_user)
-    #
-    #     # Optionally update session with user info if necessary
-    #     session["user_info"] = user_info
+    if user_phone_number:
+        database = client["pickle_data"]
+        collection = database.users
+
+        existing_user = collection.find_one({"phonenumber": user_phone_number})
+
+        if not existing_user:
+            new_user = {
+                "phonenumber": user_phone_number,
+                "name": user_phone_number,
+                "friends": [],
+                "location": {"coordinates": []},
+                "status": 0
+            }
+
+            collection.insert_one(new_user)
 
     return redirect("/")
 
