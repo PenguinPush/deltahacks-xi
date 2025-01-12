@@ -163,21 +163,20 @@ def sms_system():
     # Check if this is a location update message
     if body and body.startswith("p/ck/3-"):
         try:
-            # p/ck/3-phonenumber:name:coordx:coordy:status
+            # p/ck/3-coordx:coordy:status
 
             data_str = body[7:]
-            data = data_str.split(":")
-            print(data, from_number)
+            data = list(map(int, data_str.split(":")))
 
             database = client["pickle_data"]
             collection = database.users
             result = collection.update_one(
                 {"phonenumber": from_number},
-                {"$set": {"location.coordinates": 'coord'},}
+                {"$set": {"location.coordinates": [data[0], data[1]], "status": [data[2]]}}
             )
             
             if result.modified_count > 0:
-                resp.message("📍 Location updated successfully!")
+                resp.message("📍 Location/status updated successfully!")
             else:
                 resp.message("❌ Could not update location. User not found.")
             
