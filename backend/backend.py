@@ -1,15 +1,16 @@
+import json
 import os
 from urllib.parse import quote_plus, urlencode
+
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, jsonify, render_template
+from flask import Flask, redirect, session, url_for, request, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
-import json
+
 from emergency_assistant import EmergencyAssistant
-import json
 
 load_dotenv()
 
@@ -66,6 +67,35 @@ def get_friends_info(user_phonenumber):
 def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
+
+    # Extract user information from the token
+    user_info = oauth.auth0.parse_id_token(token)
+    user_phone_number = user_info.get("phone_number", None)
+    user_name = user_info.get("name", "Unknown")
+
+    if user_phone_number:
+        # Check if user already exists in the MongoDB database
+        database = client["pickle_data"]
+        collection = database.users
+
+        existing_user = collection.find_one({"phone_number": user_phone_number})
+
+        if not existing_user:
+            # If the user doesn't exist, create a new user
+            new_user = {
+                "name": user_name,
+                "phone_number": user_phone_number,
+                "friends": [],  # Initially no friends
+                "location": {"coordinates": []},  # Initially no location
+                "status": "safe",  # Default status
+                "sid": session["user"].get("sid", None)  # Use the session sid for authentication
+            }
+
+            # Insert new user into the database
+            collection.insert_one(new_user)
+
+        # Optionally update session with user info if necessary
+        session["user_info"] = user_info
 
     return redirect("/")
 
@@ -232,7 +262,7 @@ def emergency_chat():
 
 @app.route("/")
 def home():
-    return str(json.dumps(session.get("user")))
+    return session.get("user")
 
 
 if __name__ == "__main__":
