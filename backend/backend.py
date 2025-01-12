@@ -7,26 +7,51 @@ import os
 from dotenv import load_dotenv
 from emergency_assistant import EmergencyAssistant
 
+import json
+from os import environ as env
+from urllib.parse import quote_plus, urlencode
+
+from authlib.integrations.flask_client import OAuth
+from dotenv import find_dotenv, load_dotenv
+from flask import Flask, redirect, render_template, session, url_for
+
 load_dotenv()
 
 uri = os.getenv('MONGODB_URI')
 
 app = Flask(__name__, static_folder='../frontend')
+app.secret_key = os.getenv("APP_SECRET_KEY")
+
+oauth = OAuth(app)
+
 CORS(app, resources={r"/*": {"origins": "*"}})
 client = MongoClient(uri, server_api=ServerApi('1'))
 
+<<<<<<< Updated upstream
 # Initialize the emergency assistant
 emergency_assistant = EmergencyAssistant()
+=======
+oauth.register(
+    "auth0",
+    client_id=os.getenv("AUTH0_CLIENT_ID"),
+    client_secret=os.getenv("AUTH0_CLIENT_SECRET"),
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{os.getenv("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+)
+
+>>>>>>> Stashed changes
 
 # Add the get_friends_info function here
 def get_friends_info(user_phonenumber):
     database = client["pickle_data"]
     collection = database.users
     user = collection.find_one({"phonenumber": user_phonenumber})
-    
+
     if user:
         friends_phone_numbers = user.get("friends", [])
-        
+
         friends_info = []
         for friend_phonenumber in friends_phone_numbers:
             friend = collection.find_one({"phonenumber": friend_phonenumber})
@@ -38,9 +63,41 @@ def get_friends_info(user_phonenumber):
                     "status": friend["status"]
                 }
                 friends_info.append(friend_data)
-        
+
         return friends_info
     return []
+
+
+@app.route("/callback", methods=["GET", "POST"])
+def callback():
+    token = oauth.auth0.authorize_access_token()
+    session["user"] = token
+    return redirect("/")
+
+
+@app.route("/login")
+def login():
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(
+        "https://"
+        + env.get("AUTH0_DOMAIN")
+        + "/v2/logout?"
+        + urlencode(
+            {
+                "returnTo": url_for("home", _external=True),
+                "client_id": env.get("AUTH0_CLIENT_ID"),
+            },
+            quote_via=quote_plus,
+        )
+    )
+
 
 # Add the new friends endpoint
 @app.route('/api/friends/<phone_number>')
@@ -53,29 +110,31 @@ def get_friends(phone_number):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/api/friends/add', methods=['POST'])
 def add_friend():
     try:
         data = request.get_json()
         user_phone = data.get('userPhone')
         friend_phone = data.get('friendPhone')
-        
+
         database = client["pickle_data"]
         collection = database.users
-        
+
         # Add friend to user's friends list
         result = collection.update_one(
             {"phonenumber": user_phone},
             {"$addToSet": {"friends": friend_phone}}
         )
-        
+
         if result.modified_count > 0:
             return jsonify({"message": "Friend added successfully"}), 200
         else:
             return jsonify({"error": "User not found or friend already added"}), 404
-            
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
@@ -112,20 +171,21 @@ def return_database():
     except Exception as e:
         return str(e)
 
+
 @app.route('/api/user/<phone_number>', methods=['GET'])
 def get_user(phone_number):
     try:
         database = client["pickle_data"]
         collection = database.users
         user = collection.find_one({"phonenumber": phone_number})
-        
+
         if user:
             # Convert ObjectId to string for JSON serialization
             user['_id'] = str(user['_id'])
             return jsonify(user), 200
         else:
             return jsonify({"error": "User not found"}), 404
-            
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
