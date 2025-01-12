@@ -251,8 +251,11 @@ def emergency_chat():
 
 
 @app.route("/")
-def home():
-    return session.get("user")
+def dashboard():
+    user = session.get("user")
+    if not user:
+        return redirect(url_for("login"))
+    return jsonify(user)
 
 
 if __name__ == "__main__":
