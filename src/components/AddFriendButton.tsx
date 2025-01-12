@@ -17,13 +17,13 @@ export default function AddFriendButton() {
         event.preventDefault();
 
         const myPhoneResponse = await fetch("https://www.picklehelp.us/phone", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'}
+            method: 'POST'
         });
+
+        console.log(await myPhoneResponse)
 
         const myPhoneData = await myPhoneResponse.json();
         const myPhone = myPhoneData;
-        console.log(myPhone)
 
         try {
             const apiUrl = 'https://www.picklehelp.us';
