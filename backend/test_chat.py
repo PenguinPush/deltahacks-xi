@@ -1,11 +1,7 @@
-from emergency_assistant import EmergencyAssistant
-from dotenv import load_dotenv
-
-load_dotenv()
-
+import requests
+import json
 
 def main():
-    assistant = EmergencyAssistant()
     print("Emergency Assistant Chat (type 'quit' to exit)")
     print("--------------------------------------------")
 
@@ -14,9 +10,17 @@ def main():
         if user_input.lower() == 'quit':
             break
 
-        response = assistant.get_response(user_input)
-        print(f"\nAssistant: {response['response']}")
-
+        # Send request to Flask endpoint
+        response = requests.post(
+            'http://localhost:5000/api/emergency-chat',
+            json={'message': user_input},
+            headers={'Content-Type': 'application/json'}
+        )
+        
+        if response.status_code == 200:
+            print(f"\nAssistant: {response.json()['response']}")
+        else:
+            print(f"\nError: {response.json().get('error', 'Unknown error occurred')}")
 
 if __name__ == "__main__":
     main()
