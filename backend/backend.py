@@ -1,43 +1,15 @@
-from flask import Flask, send_from_directory, request, redirect, jsonify
+import os
+from urllib.parse import quote_plus, urlencode
+
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+from flask import Flask, redirect, session, url_for, request, jsonify
 from flask_cors import CORS
-from twilio.twiml.messaging_response import MessagingResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-import os
-from dotenv import load_dotenv
+from twilio.twiml.messaging_response import MessagingResponse
+
 from emergency_assistant import EmergencyAssistant
-
-import json
-from os import environ as env
-from urllib.parse import quote_plus, urlencode
-
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
-
-import json
-from os import environ as env
-from urllib.parse import quote_plus, urlencode
-
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
-
-import json
-from os import environ as env
-from urllib.parse import quote_plus, urlencode
-
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
-
-import json
-from os import environ as env
-from urllib.parse import quote_plus, urlencode
-
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
 
 load_dotenv()
 
