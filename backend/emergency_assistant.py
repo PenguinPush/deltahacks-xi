@@ -89,12 +89,12 @@ ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
             print("Sending request to Cohere...")
             response = self.co.chat(
                 model='command-r-plus-08-2024',
-                message=full_message,  # Use the full message context
+                message=full_message,
                 preamble=self.system_prompt,
                 temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=0,  # Set to 0 to remove character limit
+                max_tokens=-1
             )
             print("Response received!", response.text)
             return {
