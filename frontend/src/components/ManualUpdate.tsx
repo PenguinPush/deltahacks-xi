@@ -1,40 +1,62 @@
 import { useState } from "react";
-import "./ManualUpdate.css"; // Import the CSS file
+import "./ManualUpdate.css";
 
-function ManualUpdate() {
-  const [isDialogOpen, setDialogOpen] = useState(false);
+type Friend = {
+    name: string;
+    phoneNumber: string;
+    geocode: [number, number];
+    popup: string;
+    location: string;
+    distance: string;
+    status: "safe" | "on-the-move" | "pickle";
+};
 
-  const openDialog = () => {
-    setDialogOpen(true);
-  };
+function ManualUpdate({ friends }: { friends: Friend[] }) {
+    const [isDialogOpen, setDialogOpen] = useState(false);
 
-  const closeDialog = () => {
-    setDialogOpen(false);
-  };
+    const openDialog = () => {
+        setDialogOpen(true);
+    };
 
-  return (
-    <>
-      <button className="dialogButton" onClick={openDialog}>Open Dialog</button>
+    const closeDialog = () => {
+        setDialogOpen(false);
+    };
 
-      {isDialogOpen && (
+    const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const textInputValue = (event.currentTarget.elements.namedItem("textInput") as HTMLInputElement).value;
+        console.log("Form submitted with input:", textInputValue);
+    };
+
+    return (
         <>
-          <div className="overlay" onClick={closeDialog}></div>
-          <div className="dialog-box">
-            <h2 style={{ color: "Black" }}>Dialog Box</h2>
-            <p>dialog box</p>
+            <button className="dialogButton" onClick={openDialog}>
+                Open Dialog
+            </button>
 
-            <form>
-              <label htmlFor="textInput">Enter Text:</label>
-              <input type="text" id="textInput" required/>
-              <button type="submit" className="dialogButton">Submit</button>
-            </form>
+            {isDialogOpen && (
+                <>
+                    <div className="overlay" onClick={closeDialog}></div>
+                    <div className="dialog-box">
+                        <h2 style={{ color: "Black" }}>Dialog Box</h2>
+                        <p>Dialog box example</p>
 
-            <button className="dialogButton" onClick={closeDialog}>Close</button>
-          </div>
+                        <form onSubmit={handleFormSubmit}>
+                            <label htmlFor="textInput">Enter Text:</label>
+                            <input type="text" id="textInput" name="textInput" required />
+                            <button type="submit" className="dialogButton">
+                                Submit
+                            </button>
+                        </form>
+
+                        <button className="dialogButton" onClick={closeDialog}>
+                            Close
+                        </button>
+                    </div>
+                </>
+            )}
         </>
-      )}
-    </>
-  );
+    );
 }
 
 export default ManualUpdate;

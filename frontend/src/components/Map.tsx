@@ -1,28 +1,24 @@
-import { useState, useEffect } from 'react';
 import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
+import { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 
-type MarkerData = {
+type Friend = {
+    name: string;
+    phoneNumber: string;
     geocode: [number, number];
-    popUp: string;
+    popup: string;
+    location: string;
+    distance: string;
+    status: "safe" | "on-the-move" | "pickle";
 };
 
-type Markers = {
-    [phoneNumber: string]: MarkerData;
+type MapProps = {
+    friends: Friend[];
+    addFriend: (friend: Friend) => void;
 };
 
-export default function Map() {
+export default function Map({ friends, addFriend }: MapProps) {
     const [location, setLocation] = useState<[number, number] | null>(null);
-    const [markers, setMarkers] = useState<Markers>({
-        "123-456-7890": {
-            geocode: [43.265777, -79.918213],
-            popUp: "Nickrod's location."
-        },
-        "098-765-4321": {
-            geocode: [43.275777, -79.918213],
-            popUp: "Patrick's location."
-        },
-    });
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
@@ -37,21 +33,18 @@ export default function Map() {
         );
     }, []);
 
-    const addMarker = (phoneNumber: string, geocode: [number, number], popUp: string) => {
-        setMarkers((prevMarkers) => ({
-            ...prevMarkers,
-            [phoneNumber]: { geocode, popUp },
-        }));
-    };
-
     return (
         <>
             {location ? (
                 <MapContainer center={location} zoom={13} style={{ height: "100vh", width: "100%" }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    {Object.entries(markers).map(([phoneNumber, markerData]) => (
-                        <Marker key={phoneNumber} position={markerData.geocode}>
-                            <Popup>{markerData.popUp}</Popup>
+                    {friends.map((friend) => (
+                        <Marker key={friend.phoneNumber} position={friend.geocode}>
+                            <Popup>
+                                <strong>{friend.name}</strong>
+                                <br />
+                                {friend.popup}
+                            </Popup>
                         </Marker>
                     ))}
                 </MapContainer>
@@ -60,9 +53,19 @@ export default function Map() {
             )}
 
             <button
-                onClick={() => addMarker("555-123-4567", [43.68074464549336, -79.62829621671438], "New Marker")}
+                onClick={() =>
+                    addFriend({
+                        name: "New Friend",
+                        phoneNumber: "555-123-4567",
+                        geocode: [43.68074464549336, -79.62829621671438],
+                        popup: `New Friend's location.`,
+                        location: "Mississauga, ON",
+                        distance: "50km",
+                        status: "on-the-move",
+                    })
+                }
             >
-                Add New Marker
+                Add New Friend
             </button>
         </>
     );
