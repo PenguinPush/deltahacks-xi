@@ -8,6 +8,7 @@ client = MongoClient(connection_string)
 db = client["pickle_data"]
 collection = db["users"]
 
+
 def insert_user(phonenumber, name, friends, location, status):
     user = {
         "phonenumber": phonenumber,
@@ -18,9 +19,10 @@ def insert_user(phonenumber, name, friends, location, status):
         },
         "status": status
     }
-    
+
     result = collection.insert_one(user)
     print(f"User inserted with ID: {result.inserted_id}")
+
 
 def get_user_by_phonenumber(phonenumber):
     user = collection.find_one({"phonenumber": phonenumber})
@@ -33,7 +35,7 @@ def get_user_by_phonenumber(phonenumber):
 def add_friend_request(user_phonenumber, friend_phonenumber):
     user = collection.find_one({"phonenumber": user_phonenumber})
     friend = collection.find_one({"phonenumber": friend_phonenumber})
-    
+
     if user and friend:
         # Add the friend's number to the user's friends list
         if friend_phonenumber not in user["friends"]:
@@ -44,7 +46,7 @@ def add_friend_request(user_phonenumber, friend_phonenumber):
             print(f"{friend_phonenumber} added to {user_phonenumber}'s friend list.")
         else:
             print(f"{friend_phonenumber} is already a friend of {user_phonenumber}.")
-        
+
         # Add the user's number to the friend's friends list
         if user_phonenumber not in friend["friends"]:
             collection.update_one(
@@ -58,13 +60,12 @@ def add_friend_request(user_phonenumber, friend_phonenumber):
         print(f"Either {user_phonenumber} or {friend_phonenumber} does not exist in the database.")
 
 
-
 def get_friends_info(user_phonenumber):
     user = collection.find_one({"phonenumber": user_phonenumber})
-    
+
     if user:
         friends_phone_numbers = user.get("friends", [])
-        
+
         friends_info = []
         for friend_phonenumber in friends_phone_numbers:
             friend = collection.find_one({"phonenumber": friend_phonenumber})
@@ -77,11 +78,12 @@ def get_friends_info(user_phonenumber):
                     "status": friend["status"]
                 }
                 friends_info.append(friend_data)
-        
+
         return friends_info
     return []
 
-#All user data
+
+# All user data
 def get_all_users():
     users = collection.find({})
     users_list = []
@@ -101,21 +103,28 @@ def get_all_users():
     return users_list
 
 
+<<<<<<< HEAD
 
 #Update your own status
+=======
+# Update your own status
+>>>>>>> ccb13cc03878dabab5378b26e986495c4f7a9a61
 def update_user_status(phonenumber, new_status):
     result = collection.update_one(
         {"phonenumber": phonenumber},
         {"$set": {"status": new_status}}
     )
-    
+
     if result.modified_count > 0:
         print(f"Status updated successfully for user {phonenumber}")
         return True
     else:
         print(f"User {phonenumber} not found or status unchanged")
         return False
+<<<<<<< HEAD
     
     
 
 get_all_users()
+=======
+>>>>>>> ccb13cc03878dabab5378b26e986495c4f7a9a61
