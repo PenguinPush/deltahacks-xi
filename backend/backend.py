@@ -16,7 +16,7 @@ load_dotenv()
 
 uri = os.getenv('MONGODB_URI')
 
-app = Flask(__name__, static_folder='../frontend')
+app = Flask(__name__)
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
 oauth = OAuth(app)
@@ -41,10 +41,10 @@ oauth.register(
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    if path != "" and os.path.exists(f'../frontend/build/{path}'):
-        return send_from_directory('../frontend/build', path)
+    if path != "" and os.path.exists(f'../frontend/dist/{path}'):
+        return send_from_directory('../frontend/dist', path)
     else:
-        return send_from_directory('../frontend/build', 'index.html')
+        return send_from_directory('../frontend/dist', 'index.html')
 
 
 def get_friends_info(user_phonenumber):
