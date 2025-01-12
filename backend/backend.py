@@ -176,14 +176,14 @@ def sms_system():
                 {"phonenumber": from_number},
                 {"$set": {"location.coordinates": [data[0], data[1]], "status": [data[2]]}}
             )
-            
+
             if result.modified_count > 0:
                 resp.message(str(get_friends_info(from_number)))
             else:
                 resp.message("❌ Could not update location. User not found.")
-            
+
             return str(resp)
-            
+
         except Exception as e:
             resp.message(f"❌ Error updating location: {str(e)}")
             return str(resp)
@@ -231,19 +231,20 @@ def get_user(phone_number):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 # Add new endpoint for emergency chat
 @app.route('/api/emergency-chat', methods=['POST'])
 def emergency_chat():
     try:
         data = request.get_json()
         user_message = data.get('message')
-        
+
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
-            
+
         response = emergency_assistant.get_response(user_message)
         return jsonify(response), 200
-        
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -251,10 +252,11 @@ def emergency_chat():
 @app.route("/")
 def dashboard():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
-    phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-    print(phone_number)
     if not user:
         return redirect(url_for("login"))
+    else:
+        phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
+        print(phone_number)
     return jsonify(user)
 
 
