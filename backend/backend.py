@@ -67,23 +67,23 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    oauth.auth0.authorize_access_token()
-    user_info = oauth.auth0.get("userinfo").json()
-
-    # Save or update user in MongoDB
-    users_collection = client.db.users
-    existing_user = users_collection.find_one({"user_id": user_info["sub"]})
-
-    if not existing_user:
-        users_collection.insert_one({
-            "user_id": user_info["sub"],
-            "phone_number": user_info.get("phone_number"),
-            "email": user_info.get("email"),
-            "profile": user_info,
-        })
-
-    session["user"] = user_info
-    print(user_info)
+    # oauth.auth0.authorize_access_token()
+    # user_info = oauth.auth0.get("userinfo").json()
+    #
+    # # Save or update user in MongoDB
+    # users_collection = client.db.users
+    # existing_user = users_collection.find_one({"user_id": user_info["sub"]})
+    #
+    # if not existing_user:
+    #     users_collection.insert_one({
+    #         "user_id": user_info["sub"],
+    #         "phone_number": user_info.get("phone_number"),
+    #         "email": user_info.get("email"),
+    #         "profile": user_info,
+    #     })
+    #
+    # session["user"] = user_info
+    print(token)
     return redirect("/")
 
 
