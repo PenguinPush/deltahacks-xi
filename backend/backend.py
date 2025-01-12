@@ -3,7 +3,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, send_from_directory, jsonify
+from flask import Flask, Response, redirect, session, url_for, request, send_from_directory, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -77,6 +77,7 @@ def callback():
     session["user"] = token
 
     user_phone_number = session["user"]["userinfo"]["name"]
+    user_phone_number = int(str(user_phone_number[-10:-1]) + str(user_phone_number[-1]))
 
     if user_phone_number:
         print("A")
@@ -117,7 +118,7 @@ def logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("dashboard", _external=True),
+                "returnTo": url_for("authorize", _external=True),
                 "client_id": os.environ.get("AUTH0_CLIENT_ID"),
             },
             quote_via=quote_plus,
@@ -261,7 +262,7 @@ def emergency_chat():
 
 
 @app.route("/authorize")
-def dashboard():
+def authorize():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
     if not user:
         return redirect(url_for("login"))
@@ -269,6 +270,16 @@ def dashboard():
         phone_number = session.get("user")["userinfo"][
             "name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
     return redirect("/")
+
+
+@app.route("/phone", methods=['POST'])
+def dashboard():
+    user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
+    if not user:
+        return "null"
+    else:
+        phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
+        return Response(phone_number, mimetype='text/plain')
 
 
 # Add new endpoint to get all users

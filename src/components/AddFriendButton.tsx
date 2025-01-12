@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import './AddFriendButton.css'
 
 export default function AddFriendButton() {
@@ -16,10 +16,17 @@ export default function AddFriendButton() {
     const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        const myPhoneResponse = await fetch("https://www.picklehelp.us/phone", {
+            method: 'POST'
+        });
+
+        const myPhone = await myPhoneResponse.text();
+        console.log(myPhone)
+
         try {
             const apiUrl = 'https://www.picklehelp.us';
             console.log('Sending request with:', {
-                userPhone: '1234567890',
+                userPhone: myPhone,
                 friendPhone: phoneNumber,
             });
 
@@ -64,7 +71,7 @@ export default function AddFriendButton() {
                 <>
                     <div className="overlay" onClick={closeDialog}></div>
                     <div className="dialog-box">
-                        <h2 style={{ color: "Black", margin: "0" }}>Add Friend</h2>
+                        <h2 style={{color: "Black", margin: "0"}}>Add Friend</h2>
                         <form className="form" onSubmit={handleFormSubmit}>
                             <label htmlFor="phoneInput">Enter Friend's Phone Number:</label>
                             <input
