@@ -31,7 +31,7 @@ Assume the user is currently in danger, and ALWAYS search the internet for what 
 
 Interpret every input as suffixed with "Help me, I am in an emergency"
 
-ONLY HELP WITH SERIOUS INQUIRIES"""
+ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
 
         # Updated tools configuration for v2
         self.web_search_tool = [
