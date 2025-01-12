@@ -271,14 +271,14 @@ def authorize():
     return redirect("/")
 
 
-@app.route("/phone")
+@app.route("/phone", methods=['POST'])
 def dashboard():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
     if not user:
         return "null"
     else:
         phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-    return redirect(phone_number)
+    return phone_number
 
 
 # Add new endpoint to get all users
