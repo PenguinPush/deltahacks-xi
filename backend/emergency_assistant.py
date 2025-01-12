@@ -53,33 +53,35 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
 
     def web_search(self, queries: list[str]) -> list[Dict]:
         documents = []
-        for query in queries:
-            response = self.tavily_client.search(query, max_results=2)
-            results = [
-                {
-                    "title": r["title"],
-                    "content": r["content"],
-                    "url": r["url"],
-                }
-                for r in response["results"]
-            ]
-            for idx, result in enumerate(results):
-                document = {"id": str(idx), "data": result}
-                documents.append(document)
+        # Only use the first query, skip the others
+        query = queries[0] if queries else ""
+        response = self.tavily_client.search(query, max_results=1)
+        results = [
+            {
+                "title": r["title"],
+                "content": r["content"][:200],  # Further reduced content length
+                "url": r["url"],
+            }
+            for r in response["results"]
+        ]
+        for idx, result in enumerate(results):
+            document = {"id": str(idx), "data": result}
+            documents.append(document)
         return documents
 
     def get_response(self, user_message: str) -> Dict[str, str]:
         try:
-            print("Sending request to Cohere...")  # Debug output
+            print("Sending request to Cohere...")
             response = self.co.chat(
                 model='command-r-plus-08-2024',
                 message=user_message,
                 preamble=self.system_prompt,
-                temperature=0.7,
+                temperature=0.9,  # Increased temperature for faster responses
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
+                max_tokens=150,  # Further reduced token limit
             )
-            print("Response received!")  # Debug output
+            print("Response received!")
             return {
                 "response": response.text
             }
