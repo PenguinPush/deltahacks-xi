@@ -3,7 +3,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
-from flask import Flask, redirect, session, url_for, request, send_from_directory
+from flask import Flask, redirect, session, url_for, request, send_from_directory, jsonify
 from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -16,7 +16,7 @@ load_dotenv()
 
 uri = os.getenv('MONGODB_URI')
 
-app = Flask(__name__, static_folder='../frontend')
+app = Flask(__name__)
 app.secret_key = os.getenv("APP_SECRET_KEY")
 
 oauth = OAuth(app)
@@ -41,10 +41,10 @@ oauth.register(
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react(path):
-    if path != "" and os.path.exists(f'../frontend/build/{path}'):
-        return send_from_directory('../frontend/build', path)
+    if path != "" and os.path.exists(f'../frontend/dist/{path}'):
+        return send_from_directory('../frontend/dist', path)
     else:
-        return send_from_directory('../frontend/build', 'index.html')
+        return send_from_directory('../frontend/dist', 'index.html')
 
 
 def get_friends_info(user_phonenumber):
