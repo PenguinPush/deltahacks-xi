@@ -83,7 +83,16 @@ def sms_system():
     body = request.values.get('Body', None)
     resp = MessagingResponse()
 
-    resp.message(body.upper())
+    # Get response from emergency assistant
+    try:
+        assistant_response = emergency_assistant.get_response(body)
+        # Extract just the response text
+        message_text = assistant_response.get('response', 'Sorry, I could not process your request.')
+    except Exception as e:
+        message_text = f"An error occurred: {str(e)}"
+
+    # Send response back via SMS
+    resp.message(message_text)
 
     return str(resp)
 
