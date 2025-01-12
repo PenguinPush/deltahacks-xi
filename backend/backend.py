@@ -166,7 +166,8 @@ def sms_system():
             # p/ck/3-coordx:coordy:status
 
             data_str = body[7:]
-            data = list(map(int, data_str.split(":")))
+            data = data_str.split(":")
+            data = [float(data[0]), float(data[1]), int(data[2])]
 
             database = client["pickle_data"]
             collection = database.users
