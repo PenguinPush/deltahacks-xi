@@ -23,7 +23,7 @@ function App() {
     useEffect(() => {
         const fetchFriends = async () => {
             try {
-                const apiUrl = 'http://localhost:5000';
+                const apiUrl = 'http://www.picklehelp.us';
                 const response = await fetch(`${apiUrl}/api/friends/1234567890`, {
                     method: 'GET',
                     headers: {
@@ -58,14 +58,10 @@ function App() {
         fetchFriends();
     }, []);
 
-    const addFriend = (friend: Friend) => {
-        setFriends((prevFriends) => [...prevFriends, friend]);
-    };
-
     return (
         <>
             <div id="container">
-                <Map friends={friends} addFriend={addFriend}/>
+                <Map friends={friends}/>
                 <AddFriendButton></AddFriendButton>
                 <ManualUpdate friends={friends}/>
                 {friends.map((friend) => (

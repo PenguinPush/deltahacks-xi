@@ -1,6 +1,8 @@
-import { MapContainer, Marker, TileLayer, Popup } from 'react-leaflet';
-import { useState, useEffect } from 'react';
-import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.heat";
+import { useEffect } from "react";
 
 type Friend = {
     name: string;
@@ -14,59 +16,55 @@ type Friend = {
 
 type MapProps = {
     friends: Friend[];
-    addFriend: (friend: Friend) => void;
 };
 
-export default function Map({ friends, addFriend }: MapProps) {
-    const [location, setLocation] = useState<[number, number] | null>(null);
+const HeatmapLayer = ({ data }: { data: [number, number][] }) => {
+    const map = useMap();
 
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                setLocation([latitude, longitude]);
-            },
-            (error) => {
-                console.error("Error getting location", error);
-            }
-        );
-    }, []);
+        // Add the heat layer
+        // @ts-expect-error heatLayer
+        const heatLayer = L.heatLayer(data, {
+            radius: 50, // Larger radius for better visibility
+            blur: 50,
+            maxZoom: 7,
+        });
+        heatLayer.addTo(map);
+
+        // Cleanup on component unmount
+        return () => {
+            map.removeLayer(heatLayer);
+        };
+    }, [data, map]);
+
+    return null;
+};
+
+export default function Map({ friends }: MapProps) {
+    // Prepare heatmap data
+    const heatmapData: [number, number][] = friends.map((friend) => friend.geocode);
 
     return (
-        <>
-            {location ? (
-                <MapContainer center={location} zoom={13} style={{ height: "40vh", width: "100%", borderRadius: "8px"}}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    {friends.map((friend) => (
-                        <Marker key={friend.phoneNumber} position={friend.geocode}>
-                            <Popup>
-                                <strong>{friend.name}</strong>
-                                <br />
-                                {friend.popup}
-                            </Popup>
-                        </Marker>
-                    ))}
-                </MapContainer>
-            ) : (
-                <p>Loading map...</p>
-            )}
+        <MapContainer
+            center={[37.7749, -122.4194]}
+            zoom={5}
+            style={{ height: "100vh", width: "100%" }}
+        >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-            <button
-                onClick={() =>
-                    addFriend({
-                        name: "New Friend",
-                        phoneNumber: "555-123-4567",
-                        geocode: [43.68074464549336, -79.62829621671438],
-                        popup: `New Friend's location.`,
-                        location: "Mississauga, ON",
-                        distance: "50km",
-                        status: "on-the-move",
-                    })
-                }
-            >
-                Add Test Friend
-            </button>
-        </>
+            {/* Heatmap Layer */}
+            <HeatmapLayer data={heatmapData} />
+
+            {/* Markers for Friends */}
+            {friends.map((friend) => (
+                <Marker key={friend.phoneNumber} position={friend.geocode}>
+                    <Popup>
+                        <strong>{friend.name}</strong>
+                        <br />
+                        {friend.popup}
+                    </Popup>
+                </Marker>
+            ))}
+        </MapContainer>
     );
 }
