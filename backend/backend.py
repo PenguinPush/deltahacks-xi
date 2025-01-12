@@ -68,34 +68,31 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    # Extract user information from the token
-    user_info = oauth.auth0.parse_id_token(token, nonce=token["nonce"])
-    user_phonenumber = user_info.get("phonenumber", None)
-    user_name = user_info.get("name", "Unknown")
+    print(session["user"])
 
-    if user_phonenumber:
-        # Check if user already exists in the MongoDB database
-        database = client["pickle_data"]
-        collection = database.users
-
-        existing_user = collection.find_one({"phonenumber": user_phonenumber})
-
-        if not existing_user:
-            # If the user doesn't exist, create a new user
-            new_user = {
-                "name": user_name,
-                "phonenumber": user_phonenumber,
-                "friends": [],  # Initially no friends
-                "location": {"coordinates": []},  # Initially no location
-                "status": "safe",  # Default status
-                "sid": session["user"].get("sid", None)  # Use the session sid for authentication
-            }
-
-            # Insert new user into the database
-            collection.insert_one(new_user)
-
-        # Optionally update session with user info if necessary
-        session["user_info"] = user_info
+    # if user_phone_number:
+    #     # Check if user already exists in the MongoDB database
+    #     database = client["pickle_data"]
+    #     collection = database.users
+    #
+    #     existing_user = collection.find_one({"phone_number": user_phone_number})
+    #
+    #     if not existing_user:
+    #         # If the user doesn't exist, create a new user
+    #         new_user = {
+    #             "name": user_name,
+    #             "phone_number": user_phone_number,
+    #             "friends": [],  # Initially no friends
+    #             "location": {"coordinates": []},  # Initially no location
+    #             "status": "safe",  # Default status
+    #             "sid": session["user"].get("sid", None)  # Use the session sid for authentication
+    #         }
+    #
+    #         # Insert new user into the database
+    #         collection.insert_one(new_user)
+    #
+    #     # Optionally update session with user info if necessary
+    #     session["user_info"] = user_info
 
     return redirect("/")
 
