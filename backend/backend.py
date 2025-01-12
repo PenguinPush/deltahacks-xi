@@ -88,7 +88,7 @@ def sms_system():
 def return_database():
     try:
         database = client["pickle_data"]
-        users = database.users.find({"cuisine": "Spanish"})
+        users = database.users.find({})
         results = []
 
         for user in users:
