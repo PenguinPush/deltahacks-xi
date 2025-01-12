@@ -24,7 +24,7 @@ export default function SMSButton() {
 
     return (
         <>
-            <button className="dialogButton" onClick={sendSMS}>Chatbot</button>
+            <button className="dialogButton" onClick={sendSMS}>Agent</button>
         </>
     );
 }
