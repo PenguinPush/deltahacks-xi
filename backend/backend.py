@@ -1,6 +1,6 @@
 from flask import Flask, send_from_directory, request, redirect, jsonify
 from flask_cors import CORS
-#from twilio.twiml.messaging_response import MessagingResponse
+from twilio.twiml.messaging_response import MessagingResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
