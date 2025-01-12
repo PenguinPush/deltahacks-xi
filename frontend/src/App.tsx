@@ -5,7 +5,6 @@ import ManualUpdate from "./components/ManualUpdate";
 import AddFriendButton from "./components/AddFriendButton";
 import SMSButton from "./components/SMSButton";
 import { useState, useEffect } from "react";
-import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 
 type userStatus = "safe" | "on-the-move" | "pickle";
 
@@ -19,27 +18,16 @@ type Friend = {
     status: userStatus;
 };
 
-const auth0Domain = import.meta.env.VITE_AUTH0_DOMAIN;
-const auth0Client = import.meta.env.VITE_AUTH0_CLIENT_ID;
-
-
 function AppContent() {
-    const { isAuthenticated, loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0();
     const [friends, setFriends] = useState<Friend[]>([]);
 
     useEffect(() => {
         const fetchFriends = async () => {
-            if (!isAuthenticated) {
-                return;
-            }
-
             try {
-                const accessToken = await getAccessTokenSilently();
                 const apiUrl = 'http://www.picklehelp.us';
-                const response = await fetch(`${apiUrl}/api/friends/${user?.phoneNumber}`, {
+                const response = await fetch(`${apiUrl}/api/friends`, {
                     method: 'GET',
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
@@ -69,22 +57,10 @@ function AppContent() {
         };
 
         fetchFriends();
-    }, [isAuthenticated, getAccessTokenSilently, user]);
-
-    if (!isAuthenticated) {
-        return (
-            <div>
-                <h1>Welcome to PickleHelp</h1>
-                <button onClick={() => loginWithRedirect()}>Log In</button>
-            </div>
-        );
-    }
+    }, []);
 
     return (
         <div id="container">
-            <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
-                Log Out
-            </button>
             <Map friends={friends} />
             <SMSButton />
             <AddFriendButton />
@@ -103,15 +79,5 @@ function AppContent() {
 }
 
 export default function App() {
-    return (
-        <Auth0Provider
-            domain={auth0Domain}
-            clientId={auth0Client}
-            authorizationParams={{
-                redirect_uri: window.location.origin,
-            }}
-        >
-            <AppContent />
-        </Auth0Provider>
-    );
+    return <AppContent />;
 }

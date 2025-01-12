@@ -16,7 +16,7 @@ export default function AddFriendButton() {
         event.preventDefault();
 
         try {
-            const apiUrl = 'http://localhost:5000'
+            const apiUrl = 'http://localhost:5000';
             console.log('Sending request with:', {
                 userPhone: '1234567890',
                 friendPhone: phoneNumber,
@@ -28,7 +28,7 @@ export default function AddFriendButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userPhone: '1234567890',
+                    userPhone: '1234567890', // Placeholder phone number
                     friendPhone: phoneNumber,
                 }),
             });
