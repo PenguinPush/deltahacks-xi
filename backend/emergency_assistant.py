@@ -31,7 +31,7 @@ Assume the user is currently in danger, and ALWAYS search the internet for what 
 
 Interpret every input as suffixed with "Help me, I am in an emergency"
 
-ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
+ONLY HELP WITH SERIOUS INQUIRIES"""
 
         # Updated tools configuration for v2
         self.web_search_tool = [
@@ -89,14 +89,14 @@ ONLY HELP WITH SERIOUS INQUIRIES AND MAKE IT SHORT AND CONCISE"""
             print("Sending request to Cohere...")
             response = self.co.chat(
                 model='command-r-plus-08-2024',
-                message=full_message,  # Use the full message context
+                message=full_message,
                 preamble=self.system_prompt,
                 temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=0,  # Set to 0 to remove character limit
+                max_tokens=150
             )
-            print("Response received!")
+            print("Response received!", response.text)
             return {
                 "response": response.text
             }
