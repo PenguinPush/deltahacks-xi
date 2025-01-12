@@ -29,90 +29,58 @@ function AppContent() {
     const mainUserPhoneNumber = "+16476369303"; 
     const [mainUser, setMainUser] = useState<Friend | null>(null); 
 
+    // Manually generated friends data
     useEffect(() => {
-        const fetchFriends = async () => {
-            try {
-                const apiUrl = "https://www.picklehelp.us";
-                const response = await fetch(`${apiUrl}/api/users`, {
-                    method: "GET",
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "application/json",
-                    },
-                });
+        const mockFriends: Friend[] = [
+            {
+                name: "James Marriott",
+                phoneNumber: "+1234567890",
+                geocode: [37.7749, -122.4194], 
+                popup: "James Marriott's location",
+                location: "San Francisco, CA",
+                distance: "5 miles",
+                status: "safe",
+            },
+            {
+                name: "Ella Roberts",
+                phoneNumber: "+1987654321",
+                geocode: [34.0522, -118.2437],
+                popup: "Ella Roberts's location",
+                location: "Los Angeles, CA",
+                distance: "300 miles",
+                status: "on-the-move",
+            },
+            {
+                name: "Liam Johnson",
+                phoneNumber: "+14155552671",
+                geocode: [40.7128, -74.006],
+                popup: "Liam Johnson's location",
+                location: "New York, NY",
+                distance: "2,500 miles",
+                status: "pickle",
+            },
+        ];
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data: ApiFriend[] = await response.json();
-
-                const transformedFriends: Friend[] = data
-                    .map((friend) => {
-                        if (
-                            typeof friend.name === "string" &&
-                            typeof friend.phoneNumber === "string" &&
-                            Array.isArray(friend.geocode) &&
-                            friend.geocode.length === 2 &&
-                            typeof friend.geocode[0] === "number" &&
-                            typeof friend.geocode[1] === "number" &&
-                            typeof friend.status === "string"
-                        ) {
-                            const validStatus = ["safe", "on-the-move", "pickle"].includes(friend.status)
-                                ? (friend.status as userStatus)
-                                : "safe"; 
-
-                            return {
-                                name: friend.name,
-                                phoneNumber: friend.phoneNumber,
-                                geocode: friend.geocode as [number, number],
-                                popup: `${friend.name}'s location`,
-                                location: "", 
-                                distance: "", 
-                                status: validStatus,
-                            };
-                        }
-                        console.warn("Invalid friend data:", friend);
-                        return null;
-                    })
-                    .filter((f): f is Friend => f !== null); 
-
-                const filteredFriends = transformedFriends.filter(
-                    (friend) => friend.phoneNumber !== mainUserPhoneNumber
-                );
-                const mainUserData = transformedFriends.find(
-                    (friend) => friend.phoneNumber === mainUserPhoneNumber
-                );
-
-                setFriends(filteredFriends);
-                setMainUser(mainUserData || null);
-            } catch (error) {
-                console.error("Error fetching friends:", error);
-                setFriends([]); 
-                setMainUser(null);
-            }
+        const mainUserMock: Friend = {
+            name: "Your Name",
+            phoneNumber: mainUserPhoneNumber,
+            geocode: [37.3382, -121.8863],
+            popup: "Your location",
+            location: "San Jose, CA",
+            distance: "0 miles",
+            status: "safe",
         };
 
-        fetchFriends();
-    }, []);
+        setFriends(mockFriends);
+        setMainUser(mainUserMock);
+    }, [mainUserPhoneNumber]);
 
     const handleUpdateMainUserStatus = (newStatus: userStatus) => {
         if (mainUser) {
             const updatedMainUser = { ...mainUser, status: newStatus };
             setMainUser(updatedMainUser);
 
-            fetch("https://www.picklehelp.us/api/update-status", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    phoneNumber: mainUser.phoneNumber,
-                    status: newStatus,
-                }),
-            }).catch((error) => {
-                console.error("Error updating status:", error);
-            });
+            console.log("Updated Main User Status:", updatedMainUser);
         }
     };
 

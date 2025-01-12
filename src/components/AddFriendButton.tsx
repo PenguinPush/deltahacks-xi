@@ -29,7 +29,7 @@ export default function AddFriendButton() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userPhone: '1234567890', // Placeholder phone number
+                    userPhone: '1234567890', 
                     friendPhone: phoneNumber,
                 }),
             });

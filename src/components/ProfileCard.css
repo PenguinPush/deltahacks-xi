@@ -10,7 +10,8 @@
 }
 
 .profile {
-    background-color: red;
+    background-color: lightgray;
+    color: black;
     border-radius: 100%;
     font-size: 32px;
     width: 2em;

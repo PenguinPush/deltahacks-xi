@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet.heat"; // Make sure you have this installed via npm
+import "leaflet.heat"; 
 import { useEffect, useState } from "react";
 import SMSButton from "./SMSButton";
 
@@ -33,20 +33,17 @@ const HeatmapLayer = ({ data }: { data: [number, number][] }) => {
             return;
         }
 
-        // Debugging: Log heatmap data
         console.log("Heatmap data:", data);
 
-        //@ts-expect-error: heatLayer is not typed in leaflet.heat
+        //@ts-expect-error: heatLayer 
         const heatLayer = L.heatLayer(data, {
-            radius: 25, // Adjust to control the size of the heatmap points
-            blur: 15,   // Controls the gradient smoothness
-            maxZoom: 10 // Specifies clustering behavior
+            radius: 100, 
+            blur: 25,   
+            maxZoom: 10 
         });
 
-        // Add the heat layer to the map
         heatLayer.addTo(map);
 
-        // Cleanup: Remove the layer on unmount
         return () => {
             if (map.hasLayer(heatLayer)) {
                 map.removeLayer(heatLayer);
@@ -61,45 +58,47 @@ export default function Map({ friends }: MapProps) {
     const [users, setUsers] = useState<APIUser[]>([]);
     const [showHeatmap, setShowHeatmap] = useState(true);
 
-    useEffect(() => {
-        async function fetchUsers() {
-            try {
-                const response = await fetch("https://picklehelp.us/api/users");
-                if (!response.ok) {
-                    // Log the response if it's not OK
-                    const text = await response.text();
-                    console.error("Error fetching users:", text);
-                    return;
-                }
-                const data: Array<{
-                    name: string;
-                    phoneNumber: string;
-                    geocode: [number, number];
-                    status: "safe" | "on-the-move" | "pickle";
-                }> = await response.json();
+    const fakeFriends: Friend[] = [
+        {
+            name: "John Doe",
+            phoneNumber: "+1234567890",
+            geocode: [37.7749, -122.4194],
+            popup: "John Doe's location",
+            status: "safe",
+        },
+        {
+            name: "Jane Smith",
+            phoneNumber: "+1234567891",
+            geocode: [34.0522, -118.2437],
+            popup: "Jane Smith's location",
+            status: "on-the-move",
+        },
+        {
+            name: "Alice Brown",
+            phoneNumber: "+1234567892",
+            geocode: [36.7783, -119.4179],
+            popup: "Alice Brown's location",
+            status: "pickle",
+        },
+        {
+            name: "Bob White",
+            phoneNumber: "+1234567893",
+            geocode: [38.5816, -121.4944],
+            popup: "Bob White's location",
+            status: "safe",
+        },
+        {
+            name: "Charlie Green",
+            phoneNumber: "+1234567894",
+            geocode: [32.7157, -117.1611],
+            popup: "Charlie Green's location",
+            status: "on-the-move",
+        },
+    ];
 
-                const users: APIUser[] = data.map((user) => ({
-                    name: user.name || "Unknown",
-                    phoneNumber: user.phoneNumber || "N/A",
-                    geocode: user.geocode || [0.0, 0.0],
-                    status: user.status || "unknown",
-                }));
-                
+    const allFriends = [...friends, ...fakeFriends];
 
-                setUsers(users);
-            } catch (error) {
-                console.error("Error fetching users:", error);
-            }
-        }
-
-        fetchUsers();
-    }, []);
-
-    // Heatmap data preparation
-    const heatmapData: [number, number][] = users.map((user) => [
-        user.geocode[0], // Latitude first
-        user.geocode[1], // Longitude second
-    ]);
+    const heatmapData: [number, number][] = allFriends.map((friend) => friend.geocode);
 
     return (
         <div>
@@ -114,8 +113,8 @@ export default function Map({ friends }: MapProps) {
                 <SMSButton />
             </div>
             <MapContainer
-                center={[37.7749, -122.4194]} // Center on San Francisco
-                zoom={5}
+                center={[36.7783, -119.4179]}
+                zoom={6}
                 style={{ height: "40vh", width: "90vw", borderRadius: "8px" }}
             >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -123,7 +122,7 @@ export default function Map({ friends }: MapProps) {
                 {showHeatmap ? (
                     <HeatmapLayer data={heatmapData} />
                 ) : (
-                    friends.map((friend) => (
+                    allFriends.map((friend) => (
                         <Marker key={friend.phoneNumber} position={friend.geocode}>
                             <Popup>
                                 <strong>{friend.name}</strong>

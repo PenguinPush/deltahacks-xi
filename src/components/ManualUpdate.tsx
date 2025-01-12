@@ -72,7 +72,7 @@ function ManualUpdate({ friends }: { friends: Friend[] }) {
     return (
         <>
             <button className="dialogButton" onClick={openDialog}>
-                Open Dialog
+                Update Friends
             </button>
 
             {isDialogOpen && (
