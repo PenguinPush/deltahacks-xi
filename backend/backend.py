@@ -140,8 +140,11 @@ def get_friends(phone_number):
 @app.route('/api/friends/add', methods=['POST'])
 def add_friend():
     try:
+        token = oauth.auth0.authorize_access_token()
+        session["user"] = token
+
         data = request.get_json()
-        user_phone = data.get('userPhone')
+        user_phone = session["user"]["userinfo"]["name"]
         friend_phone = data.get('friendPhone')
 
         database = client["pickle_data"]
