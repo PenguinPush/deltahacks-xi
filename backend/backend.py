@@ -11,6 +11,7 @@ from pymongo.server_api import ServerApi
 from twilio.twiml.messaging_response import MessagingResponse
 
 from emergency_assistant import EmergencyAssistant
+from mongo_script import get_friends_info
 
 load_dotenv()
 
@@ -156,49 +157,43 @@ def add_friend():
 
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_system():
-    # Get the message the user sent our Twilio number
     body = request.values.get('Body', None)
-    # Get the sender's phone number
     from_number = request.values.get('From', None)
     resp = MessagingResponse()
 
     # Check if this is a location update message
     if body and body.startswith("p/ck/3-"):
         try:
-            # Extract coordinates from the message
-            coords_str = body[7:]  # Remove "p/ck/3-" prefix
-            coords = json.loads(coords_str)  # Convert string to list
-            
-            # Update user's location in database
+            # p/ck/3-coordx:coordy:status
+
+            data_str = body[7:]
+            data = data_str.split(":")
+            data = [float(data[0]), float(data[1]), int(data[2])]
+
             database = client["pickle_data"]
             collection = database.users
             result = collection.update_one(
                 {"phonenumber": from_number},
-                {"$set": {"location.coordinates": coords}}
+                {"$set": {"location.coordinates": [data[0], data[1]], "status": [data[2]]}}
             )
-            
+
             if result.modified_count > 0:
-                resp.message("📍 Location updated successfully!")
+                resp.message(str(get_friends_info(from_number)))
             else:
                 resp.message("❌ Could not update location. User not found.")
-            
+
             return str(resp)
-            
+
         except Exception as e:
             resp.message(f"❌ Error updating location: {str(e)}")
             return str(resp)
 
-    # If not a location update, proceed with normal chatbot response
-    resp.message("🥒 Pickling it up...")
-
-    # Get response from emergency assistant
     try:
         assistant_response = emergency_assistant.get_response(body)
         message_text = assistant_response.get('response', 'Sorry, I could not process your request.')
     except Exception as e:
         message_text = f"An error occurred: {str(e)}"
 
-    # Send response back via SMS
     resp.message(message_text)
 
     return str(resp)
@@ -236,19 +231,20 @@ def get_user(phone_number):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 # Add new endpoint for emergency chat
 @app.route('/api/emergency-chat', methods=['POST'])
 def emergency_chat():
     try:
         data = request.get_json()
         user_message = data.get('message')
-        
+
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
-            
+
         response = emergency_assistant.get_response(user_message)
         return jsonify(response), 200
-        
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -256,10 +252,11 @@ def emergency_chat():
 @app.route("/")
 def dashboard():
     user = session.get("user")  # THIS IS HOW YOU GET THE USER INFO
-    phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
-    print(phone_number)
     if not user:
         return redirect(url_for("login"))
+    else:
+        phone_number = session.get("user")["userinfo"]["name"]  # THIS IS HOW YOU GET THE PHONE NUMBER (use this for backend identification of the user)
+        print(phone_number)
     return jsonify(user)
 
 
