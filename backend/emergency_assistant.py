@@ -51,6 +51,8 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
             }
         ]
 
+        self.message_history = []  # Initialize message history
+
     def web_search(self, queries: list[str]) -> list[Dict]:
         documents = []
         # Only use the first query, skip the others
@@ -71,15 +73,24 @@ ONLY HELP WITH SERIOUS INQUIRIES"""
 
     def get_response(self, user_message: str) -> Dict[str, str]:
         try:
+            # Add the new user message to history
+            self.message_history.append(user_message)
+            # Keep only the last 4 messages
+            if len(self.message_history) > 4:
+                self.message_history.pop(0)
+
+            # Prepare the full message context including history
+            full_message = "\n".join(self.message_history)
+
             print("Sending request to Cohere...")
             response = self.co.chat(
                 model='command-r-plus-08-2024',
-                message=user_message,
+                message=full_message,  # Use the full message context
                 preamble=self.system_prompt,
-                temperature=0.9,  # Increased temperature for faster responses
+                temperature=0.9,
                 search_queries_only=False,
                 connectors=[{"id": "web-search"}],
-                max_tokens=150,  # Further reduced token limit
+                max_tokens=150,
             )
             print("Response received!")
             return {
