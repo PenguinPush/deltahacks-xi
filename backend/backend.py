@@ -69,6 +69,7 @@ def callback():
     session["user"] = token
 
     print(session["user"])
+    print("a")
 
     # if user_phone_number:
     #     # Check if user already exists in the MongoDB database
