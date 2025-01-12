@@ -68,8 +68,7 @@ def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
 
-    print(session["user"])
-    print("a")
+    print(session["user"]['userinfo'])
 
     # if user_phone_number:
     #     # Check if user already exists in the MongoDB database
