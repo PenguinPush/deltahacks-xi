@@ -1,6 +1,7 @@
 ## Pickle - Emergency Response
 
-![gallery](https://github.com/user-attachments/assets/28dd03eb-6f69-4e40-b97f-4d1cd9d5d0fa) ![gallery (1)](https://github.com/user-attachments/assets/3dd083e2-d528-4921-869a-c3015af838a5) <img width="281" alt="delta" src="https://github.com/user-attachments/assets/39a85ef9-485c-42d4-be3d-7aaf905eba99" />
+![gallery](https://github.com/user-attachments/assets/28dd03eb-6f69-4e40-b97f-4d1cd9d5d0fa) ![gallery (1)](https://github.com/user-attachments/assets/3dd083e2-d528-4921-869a-c3015af838a5)
+
 
 
 
