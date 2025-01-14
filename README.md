@@ -1,3 +1,9 @@
+## Pickle - Emergency Response
+
+![gallery](https://github.com/user-attachments/assets/28dd03eb-6f69-4e40-b97f-4d1cd9d5d0fa) ![gallery (1)](https://github.com/user-attachments/assets/3dd083e2-d528-4921-869a-c3015af838a5) <img width="281" alt="delta" src="https://github.com/user-attachments/assets/39a85ef9-485c-42d4-be3d-7aaf905eba99" />
+
+
+
 ## Inspiration
 Inspired by the devastating wildfires in currently ongoing Los Angeles, **Pickle** gets you out of a pickle. In times of disaster like these, people often struggle to communicate their location or status, and emergency responders face challenges in determining where help is most needed. Unlike traditional location-sharing apps, Pickle was made to have a low barrier to entry and usage, yet maintains privacy by only sharing your location during emergencies. We wanted to create a tool that bettered lives by offering emergency-activated location tracking, anonymous data for large-scale disaster response, and internet-connected AI-powered survival assistance, all without the boundaries of having to stay connected to the internet or cellular data. Our mission was to leverage a combination of modern and old technology (SMS MESSAGING?!) to save lives, improve rescue coordination, and lift people up on the worst day of their lives.
 
